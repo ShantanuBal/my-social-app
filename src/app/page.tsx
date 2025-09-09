@@ -17,7 +17,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Tagline */}
           <h2 className="text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed">
-            Your gateway to build better friendships and stronger communities
+            Your gateway to building better friendships and stronger communities
           </h2>
 
           {/* Description */}
