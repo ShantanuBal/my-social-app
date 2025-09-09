@@ -7,7 +7,7 @@ export default function Home() {
       <header className="w-full py-6 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Social Connections
+            Anti-Seattle Freeze
           </h1>
         </div>
       </header>
@@ -17,15 +17,15 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Tagline */}
           <h2 className="text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed">
-            Your gateway to building better friendships and stronger communities
+            Thawing the freeze one snowflake at a time
           </h2>
 
           {/* Description */}
           <div className="max-w-2xl mx-auto">
             <p className="text-gray-400 text-lg leading-relaxed mb-6">
-              In a world where digital connections often feel shallow, Social Connections brings authenticity back to meeting people. 
-              Whether you are new to a city, looking to expand your social circle, or wanting to build meaningful relationships with 
-              like-minded individuals nearby, we make it easy to discover and connect with amazing people in your community.
+              In a world where digital connections often feel shallow, Anti-Seattle Freeze brings authenticity back to meeting people. 
+              Whether you are new to the city, looking to expand your social circle, or wanting to build meaningful relationships with 
+              like-minded individuals nearby, we make it easy to discover and connect with amazing people in the Seattle region.
             </p>
             <p className="text-gray-400 text-lg leading-relaxed">
               From coffee meetups and hobby groups to community events and spontaneous hangouts - real connections start here.
