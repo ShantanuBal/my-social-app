@@ -1,0 +1,21 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "5705aa37eb6109862ab85a9dac5337a1f7bea3b52ddf3bcd30fdb3921bec458e": {
+      "displayName": "AntiSeattleFreezeStackProd Template",
+      "source": {
+        "path": "AntiSeattleFreezeStackProd.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "228130335524-us-west-2-f3f45cef": {
+          "bucketName": "cdk-hnb659fds-assets-228130335524-us-west-2",
+          "objectKey": "5705aa37eb6109862ab85a9dac5337a1f7bea3b52ddf3bcd30fdb3921bec458e.json",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-file-publishing-role-228130335524-us-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

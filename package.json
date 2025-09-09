@@ -6,26 +6,40 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup-db": "tsx scripts/setup-dynamodb.ts",
+    "cdk": "cdk",
+    "cdk:deploy": "cdk deploy",
+    "cdk:destroy": "cdk destroy",
+    "cdk:list": "cdk list",
+    "cdk:diff": "cdk diff",
+    "seed-events": "tsx scripts/seed-events.ts",
+    "seed-local": "NODE_ENV=development tsx scripts/seed-events.ts",
+    "seed-prod": "NODE_ENV=production tsx scripts/seed-events.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.883.0",
     "@aws-sdk/client-dynamodb": "^3.883.0",
     "@aws-sdk/client-s3": "^3.884.0",
+    "@aws-sdk/lib-dynamodb": "^3.883.0",
     "lucide-react": "^0.543.0",
     "next": "15.5.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.13",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "aws-cdk-lib": "^2.214.0",
+    "constructs": "^10.4.2",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }

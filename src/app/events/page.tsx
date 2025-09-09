@@ -1,35 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 
 export default function EventsPage() {
-  const events = [
-    {
-      id: 1,
-      title: "Coffee & Connections at Pike Place",
-      description: "Join fellow coffee enthusiasts for morning conversations and networking in the heart of Seattle.",
-      date: "2025-09-15",
-      time: "9:00 AM",
-      location: "Pike Place Market, Seattle",
-      attendees: 12,
-      maxAttendees: 20,
-      category: "Networking",
-      image: "☕"
-    },
-    {
-      id: 2,
-      title: "Capitol Hill Art Walk & Meet",
-      description: "Explore local galleries and street art while meeting creative minds in Capitol Hill.",
-      date: "2025-09-18",
-      time: "6:00 PM",
-      location: "Capitol Hill, Seattle",
-      attendees: 8,
-      maxAttendees: 15,
-      category: "Arts & Culture",
-      image: "🎨"
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) throw new Error('Failed to fetch events');
+        const data = await response.json();
+        setEvents(data);
+      } catch (err) {
+        setError('Failed to load events');
+        console.error('Error fetching events:', err);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+
+    fetchEvents();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,6 +46,22 @@ export default function EventsPage() {
     };
     return colors[category] || 'bg-gray-500';
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-xl">Loading events...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-xl text-red-400">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -76,7 +87,7 @@ export default function EventsPage() {
       <main className="w-full py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+            {events.map((event: any) => (
               <div
                 key={event.id}
                 className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors duration-300 border border-gray-800 hover:border-gray-600 flex flex-col h-full"
@@ -125,7 +136,7 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  {/* Join Button - This will now stick to bottom */}
+                  {/* Join Button */}
                   <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
                     Join Event
                   </button>
