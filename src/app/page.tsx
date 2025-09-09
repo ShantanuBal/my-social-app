@@ -1,102 +1,137 @@
-import Image from "next/image";
+import React from 'react';
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* Header */}
+      <header className="w-full py-6 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Social Connections
+          </h1>
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          {/* Tagline */}
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed">
+            Your gateway to build better friendships and stronger communities
+          </h2>
+
+          {/* Description */}
+          <div className="max-w-2xl mx-auto">
+            <p className="text-gray-400 text-lg leading-relaxed mb-6">
+              In a world where digital connections often feel shallow, Social Connections brings authenticity back to meeting people. 
+              Whether you're new to a city, looking to expand your social circle, or wanting to build meaningful relationships with 
+              like-minded individuals nearby, we make it easy to discover and connect with amazing people in your community.
+            </p>
+            <p className="text-gray-400 text-lg leading-relaxed">
+              From coffee meetups and hobby groups to community events and spontaneous hangouts – real connections start here.
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <div className="pt-8">
+            <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-12 rounded-full text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              Book Tickets
+            </button>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Generated Image Section */}
+      <section className="w-full py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative">
+            {/* SVG Illustration */}
+            <svg
+              viewBox="0 0 800 400"
+              className="w-full h-auto max-w-3xl mx-auto"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Background gradient */}
+              <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1f2937" />
+                  <stop offset="100%" stopColor="#111827" />
+                </linearGradient>
+                <linearGradient id="personGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3b82f6" />
+                  <stop offset="100%" stopColor="#8b5cf6" />
+                </linearGradient>
+                <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+
+              {/* Background */}
+              <rect width="800" height="400" fill="url(#bgGradient)" rx="20" />
+
+              {/* Connection lines */}
+              <g stroke="url(#connectionGradient)" strokeWidth="2" opacity="0.6">
+                <line x1="150" y1="150" x2="350" y2="200" />
+                <line x1="350" y1="200" x2="650" y2="150" />
+                <line x1="150" y1="150" x2="400" y2="300" />
+                <line x1="650" y1="150" x2="400" y2="300" />
+                <line x1="250" y1="80" x2="550" y2="80" />
+                <line x1="250" y1="80" x2="150" y2="150" />
+                <line x1="550" y1="80" x2="650" y2="150" />
+              </g>
+
+              {/* People (circles) */}
+              <g fill="url(#personGradient)">
+                {/* Person 1 */}
+                <circle cx="150" cy="150" r="25" />
+                <circle cx="150" cy="140" r="8" fill="#fbbf24" />
+                
+                {/* Person 2 */}
+                <circle cx="350" cy="200" r="25" />
+                <circle cx="350" cy="190" r="8" fill="#fbbf24" />
+                
+                {/* Person 3 */}
+                <circle cx="650" cy="150" r="25" />
+                <circle cx="650" cy="140" r="8" fill="#fbbf24" />
+                
+                {/* Person 4 */}
+                <circle cx="400" cy="300" r="25" />
+                <circle cx="400" cy="290" r="8" fill="#fbbf24" />
+                
+                {/* Person 5 */}
+                <circle cx="250" cy="80" r="25" />
+                <circle cx="250" cy="70" r="8" fill="#fbbf24" />
+                
+                {/* Person 6 */}
+                <circle cx="550" cy="80" r="25" />
+                <circle cx="550" cy="70" r="8" fill="#fbbf24" />
+              </g>
+
+              {/* Connection nodes (smaller circles) */}
+              <g fill="#06b6d4" opacity="0.8">
+                <circle cx="300" cy="120" r="4" />
+                <circle cx="500" cy="180" r="4" />
+                <circle cx="200" cy="250" r="4" />
+                <circle cx="600" cy="250" r="4" />
+              </g>
+
+              {/* Text */}
+              <text x="400" y="50" textAnchor="middle" fill="#e5e7eb" fontSize="24" fontWeight="bold">
+                Connect • Share • Grow
+              </text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full py-6 px-4 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-gray-500 text-sm">
+            Building meaningful connections, one conversation at a time.
+          </p>
+        </div>
       </footer>
     </div>
   );
