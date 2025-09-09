@@ -29,7 +29,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto">
             <p className="text-gray-400 text-lg leading-relaxed mb-6">
               In a world where digital connections often feel shallow, Seattle Anti-Freeze brings authenticity back to meeting people. 
-              Whether you're new to the city, looking to expand your social circle, or wanting to build meaningful relationships with 
+              Whether you&apos;re new to the city, looking to expand your social circle, or wanting to build meaningful relationships with 
               like-minded individuals nearby, we make it easy to discover and connect with amazing people in your community.
             </p>
             <p className="text-gray-400 text-lg leading-relaxed">
