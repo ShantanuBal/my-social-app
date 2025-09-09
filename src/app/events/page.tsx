@@ -31,7 +31,7 @@ export default function EventsPage() {
     }
   ];
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
@@ -40,8 +40,8 @@ export default function EventsPage() {
     });
   };
 
-  const getCategoryColor = (category) => {
-    const colors = {
+  const getCategoryColor = (category: string) => {
+    const colors: { [key: string]: string } = {
       'Networking': 'bg-blue-500',
       'Arts & Culture': 'bg-purple-500',
       'Community': 'bg-green-500',
@@ -79,7 +79,7 @@ export default function EventsPage() {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors duration-300 border border-gray-800 hover:border-gray-600"
+                className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors duration-300 border border-gray-800 hover:border-gray-600 flex flex-col h-full"
               >
                 {/* Event Image/Icon */}
                 <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
@@ -87,46 +87,46 @@ export default function EventsPage() {
                 </div>
 
                 {/* Event Content */}
-                <div className="p-6">
+                <div className="p-6 flex flex-col flex-1">
                   {/* Category Badge */}
-                  <div className="mb-3">
+                  <div className="mb-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold text-white ${getCategoryColor(event.category)}`}>
                       {event.category}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold mb-3 text-white">
+                  <h3 className="text-xl font-bold mb-4 text-white">
                     {event.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-gray-400 mb-4 text-sm leading-relaxed">
+                  <p className="text-gray-400 mb-6 text-sm leading-relaxed">
                     {event.description}
                   </p>
 
                   {/* Event Details */}
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-3 mb-6 flex-1">
                     <div className="flex items-center text-sm text-gray-300">
-                      <Calendar className="w-4 h-4 mr-2" />
+                      <Calendar className="w-4 h-4 mr-3" />
                       <span>{formatDate(event.date)}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-300">
-                      <Clock className="w-4 h-4 mr-2" />
+                      <Clock className="w-4 h-4 mr-3" />
                       <span>{event.time}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-300">
-                      <MapPin className="w-4 h-4 mr-2" />
+                      <MapPin className="w-4 h-4 mr-3" />
                       <span>{event.location}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-300">
-                      <Users className="w-4 h-4 mr-2" />
+                      <Users className="w-4 h-4 mr-3" />
                       <span>{event.attendees}/{event.maxAttendees} attending</span>
                     </div>
                   </div>
 
-                  {/* Join Button */}
-                  <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105">
+                  {/* Join Button - This will now stick to bottom */}
+                  <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
                     Join Event
                   </button>
                 </div>
