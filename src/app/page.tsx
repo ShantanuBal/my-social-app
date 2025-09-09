@@ -1,13 +1,18 @@
+'use client';
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
       <header className="w-full py-6 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Anti-Seattle Freeze
+            Seattle Anti-Freeze
           </h1>
         </div>
       </header>
@@ -23,9 +28,9 @@ export default function Home() {
           {/* Description */}
           <div className="max-w-2xl mx-auto">
             <p className="text-gray-400 text-lg leading-relaxed mb-6">
-              In a world where digital connections often feel shallow, Anti-Seattle Freeze brings authenticity back to meeting people. 
-              Whether you are new to the city, looking to expand your social circle, or wanting to build meaningful relationships with 
-              like-minded individuals nearby, we make it easy to discover and connect with amazing people in the Seattle region.
+              In a world where digital connections often feel shallow, Seattle Anti-Freeze brings authenticity back to meeting people. 
+              Whether you're new to the city, looking to expand your social circle, or wanting to build meaningful relationships with 
+              like-minded individuals nearby, we make it easy to discover and connect with amazing people in your community.
             </p>
             <p className="text-gray-400 text-lg leading-relaxed">
               From coffee meetups and hobby groups to community events and spontaneous hangouts - real connections start here.
@@ -34,8 +39,11 @@ export default function Home() {
 
           {/* CTA Button */}
           <div className="pt-8">
-            <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-12 rounded-full text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Book Tickets
+            <button 
+              onClick={() => window.location.href = '/events'}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-12 rounded-full text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer"
+            >
+              View Events
             </button>
           </div>
         </div>
