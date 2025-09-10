@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-// import { useRouter } from 'next/navigation';
+import TeamFooter from '../components/TeamFooter';
 
 export default function Home() {
-  // const router = useRouter();
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -134,13 +133,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-6 px-4 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-500 text-sm">
-            Building meaningful connections, one conversation at a time.
-          </p>
-        </div>
-      </footer>
+      <TeamFooter />
+
     </div>
   );
 }

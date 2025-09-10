@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
+import TeamFooter from '../../components/TeamFooter';
 
 interface Event {
   id: string;
@@ -161,13 +162,8 @@ export default function EventsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-8 px-4 border-t border-gray-800 mt-12">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-500">
-            More events added regularly. Follow us for updates!
-          </p>
-        </div>
-      </footer>
+      <TeamFooter />
+
     </div>
   );
 }
