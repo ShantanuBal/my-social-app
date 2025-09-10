@@ -8,7 +8,7 @@ export default function TeamFooter() {
           Brought to you by Jen, Greg, Shan, James, Hana & Brianna
         </p>
         <p className="text-gray-500 text-xs">
-          © 2025 Anti-Seattle Freeze LLC. All rights reserved. Unauthorized freezing prohibited.
+          © 2025 Seattle Anti-Freeze LLC. All rights reserved. Unauthorized freezing prohibited.
         </p>
       </div>
     </footer>
