@@ -6,7 +6,7 @@ import { config } from '@/lib/config';
 export async function GET() {
   try {
     const command = new ScanCommand({
-      TableName: config.aws.tableName,
+      TableName: config.aws.eventsTable,
     });
     
     const response = await dynamodb.send(command);

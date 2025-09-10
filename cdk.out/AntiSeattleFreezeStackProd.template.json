@@ -7,10 +7,6 @@
      {
       "AttributeName": "id",
       "AttributeType": "S"
-     },
-     {
-      "AttributeName": "date",
-      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
@@ -18,10 +14,6 @@
      {
       "AttributeName": "id",
       "KeyType": "HASH"
-     },
-     {
-      "AttributeName": "date",
-      "KeyType": "RANGE"
      }
     ],
     "TableName": "anti-seattle-freeze-events-production"
@@ -30,6 +22,38 @@
    "DeletionPolicy": "Retain",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackProd/EventsTable-production/Resource"
+   }
+  },
+  "RegistrationsTableproduction33EE3291": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "eventId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "eventId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "userId",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "anti-seattle-freeze-registrations-production"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackProd/RegistrationsTable-production/Resource"
    }
   },
   "CDKMetadata": {
@@ -44,18 +68,13 @@
  },
  "Outputs": {
   "EventsTableNameproduction": {
-   "Description": "DynamoDB Events Table Name for production",
    "Value": {
     "Ref": "EventsTableproduction07E8F776"
    }
   },
-  "EventsTableArnproduction": {
-   "Description": "DynamoDB Events Table ARN for production",
+  "RegistrationsTableNameproduction": {
    "Value": {
-    "Fn::GetAtt": [
-     "EventsTableproduction07E8F776",
-     "Arn"
-    ]
+    "Ref": "RegistrationsTableproduction33EE3291"
    }
   }
  },

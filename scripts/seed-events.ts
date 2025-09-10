@@ -4,7 +4,7 @@ import { config } from "../lib/config";
 
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || 'us-west-2',
-  // Remove explicit credentials - let AWS SDK find them automatically
+  // Remove explicit credentials - let AWS SDK find them automaticall
 });
 
 const dynamodb = DynamoDBDocumentClient.from(client);
@@ -37,12 +37,12 @@ const events = [
 ];
 
 async function seedEvents() {
-  console.log(`Seeding events to table: ${config.aws.tableName}`);
+  console.log(`Seeding events to table: ${config.aws.eventsTable}`);
   
   for (const event of events) {
     try {
       await dynamodb.send(new PutCommand({
-        TableName: config.aws.tableName,
+        TableName: config.aws.eventsTable,
         Item: event
       }));
       console.log(`✅ Added event: ${event.title}`);

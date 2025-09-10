@@ -1,0 +1,229 @@
+'use client';
+
+import React, { useState } from 'react';
+import { X, User, Calendar, Phone, Mail } from 'lucide-react';
+
+interface RegistrationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  eventId: string;
+  eventTitle: string;
+  onSuccess: () => void;
+}
+
+export default function RegistrationModal({ 
+  isOpen, 
+  onClose, 
+  eventId, 
+  eventTitle,
+  onSuccess 
+}: RegistrationModalProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    phoneNumber: '',
+    email: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/events/${eventId}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Registration failed');
+      }
+
+      setIsSuccess(true);  // Show success message
+      onSuccess();
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    // Reset all state when closing
+    setIsSuccess(false);
+    setError('');
+    setFormData({
+      name: '',
+      age: '',
+      gender: '',
+      phoneNumber: '',
+      email: ''
+    });
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  // Success view
+  if (isSuccess) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700 text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Success!</h2>
+            <p className="text-gray-300 mb-2">You have successfully registered for</p>
+            <p className="text-blue-400 font-semibold text-lg">{eventTitle}</p>
+            <p className="text-gray-400 text-sm mt-4">
+              We&apos;ll see you there! Check your email for event details.
+            </p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Registration form view
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-white">Join Event</h2>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Event Title */}
+        <div className="mb-6">
+          <p className="text-gray-300 text-sm">Registering for:</p>
+          <p className="text-blue-400 font-semibold">{eventTitle}</p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <User className="w-4 h-4 inline mr-2" />
+              Full Name
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          {/* Age */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <Calendar className="w-4 h-4 inline mr-2" />
+              Age
+            </label>
+            <input
+              type="number"
+              required
+              min="18"
+              max="99"
+              value={formData.age}
+              onChange={(e) => setFormData({...formData, age: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="Your age"
+            />
+          </div>
+
+          {/* Gender */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Gender
+            </label>
+            <select
+              required
+              value={formData.gender}
+              onChange={(e) => setFormData({...formData, gender: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <Phone className="w-4 h-4 inline mr-2" />
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              required
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="(555) 123-4567"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <Mail className="w-4 h-4 inline mr-2" />
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="your.email@example.com"
+            />
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-400 text-sm">{error}</div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+          >
+            {isSubmitting ? 'Registering...' : 'Join Event'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

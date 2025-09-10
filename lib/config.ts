@@ -1,12 +1,12 @@
-// lib/config.ts
-export const getTableName = () => {
+export const getTableName = (tableType: 'events' | 'registrations') => {
   const environment = process.env.NODE_ENV === 'production' ? 'production' : 'local';
-  return `anti-seattle-freeze-events-${environment}`;
+  return `anti-seattle-freeze-${tableType}-${environment}`;
 };
 
 export const config = {
   aws: {
     region: process.env.AWS_REGION || 'us-west-2',
-    tableName: getTableName(),
+    eventsTable: getTableName('events'),
+    registrationsTable: getTableName('registrations'),
   }
 };

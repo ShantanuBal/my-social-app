@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 import TeamFooter from '../../components/TeamFooter';
+import RegistrationModal from '../../components/RegistrationModal';
 
 interface Event {
   id: string;
@@ -22,8 +23,10 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    async function fetchEvents() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  const fetchEvents = async () => {
       try {
         const response = await fetch('/api/events');
         if (!response.ok) throw new Error('Failed to fetch events');
@@ -37,6 +40,17 @@ export default function EventsPage() {
       }
     }
 
+  const handleJoinEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleRegistrationSuccess = () => {
+    // Refresh events to show updated attendee count
+    fetchEvents();
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, []);
 
@@ -60,6 +74,7 @@ export default function EventsPage() {
     };
     return colors[category] || 'bg-gray-500';
   };
+
 
   if (loading) {
     return (
@@ -151,7 +166,7 @@ export default function EventsPage() {
                   </div>
 
                   {/* Join Button */}
-                  <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
+                  <button onClick={() => handleJoinEvent(event)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
                     Join Event
                   </button>
                 </div>
@@ -160,6 +175,17 @@ export default function EventsPage() {
           </div>
         </div>
       </main>
+
+      {/* Registration Modal */}
+      {selectedEvent && (
+        <RegistrationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            eventId={selectedEvent.id}
+            eventTitle={selectedEvent.title}
+            onSuccess={handleRegistrationSuccess}
+        />
+      )}
 
       {/* Footer */}
       <TeamFooter />

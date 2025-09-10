@@ -7,10 +7,6 @@
      {
       "AttributeName": "id",
       "AttributeType": "S"
-     },
-     {
-      "AttributeName": "date",
-      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
@@ -18,10 +14,6 @@
      {
       "AttributeName": "id",
       "KeyType": "HASH"
-     },
-     {
-      "AttributeName": "date",
-      "KeyType": "RANGE"
      }
     ],
     "TableName": "anti-seattle-freeze-events-local"
@@ -30,6 +22,38 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackLocal/EventsTable-local/Resource"
+   }
+  },
+  "RegistrationsTablelocal9CAA1EE3": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "eventId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "eventId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "userId",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "anti-seattle-freeze-registrations-local"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackLocal/RegistrationsTable-local/Resource"
    }
   },
   "CDKMetadata": {
@@ -44,18 +68,13 @@
  },
  "Outputs": {
   "EventsTableNamelocal": {
-   "Description": "DynamoDB Events Table Name for local",
    "Value": {
     "Ref": "EventsTablelocalB745547A"
    }
   },
-  "EventsTableArnlocal": {
-   "Description": "DynamoDB Events Table ARN for local",
+  "RegistrationsTableNamelocal": {
    "Value": {
-    "Fn::GetAtt": [
-     "EventsTablelocalB745547A",
-     "Arn"
-    ]
+    "Ref": "RegistrationsTablelocal9CAA1EE3"
    }
   }
  },
