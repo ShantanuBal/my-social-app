@@ -35,9 +35,35 @@
      {
       "AttributeName": "userId",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "registeredAt",
+      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "registeredAt",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
     "KeySchema": [
      {
       "AttributeName": "eventId",
@@ -54,6 +80,48 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackLocal/RegistrationsTable-local/Resource"
+   }
+  },
+  "UsersTablelocalC6C21C46": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "anti-seattle-freeze-users-local"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackLocal/UsersTable-local/Resource"
    }
   },
   "CDKMetadata": {
@@ -75,6 +143,11 @@
   "RegistrationsTableNamelocal": {
    "Value": {
     "Ref": "RegistrationsTablelocal9CAA1EE3"
+   }
+  },
+  "UsersTableNamelocal": {
+   "Value": {
+    "Ref": "UsersTablelocalC6C21C46"
    }
   }
  },

@@ -29,6 +29,34 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
       removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
     });
 
+    registrationsTable.addGlobalSecondaryIndex({
+        indexName: 'email-index',
+        partitionKey: {
+        name: 'email',
+        type: dynamodb.AttributeType.STRING
+        },
+        sortKey: {
+        name: 'registeredAt',
+        type: dynamodb.AttributeType.STRING
+        }
+      });
+
+    // Users table
+    const usersTable = new dynamodb.Table(this, `UsersTable-${environment}`, {
+      tableName: `anti-seattle-freeze-users-${environment}`,
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+    });
+
+    usersTable.addGlobalSecondaryIndex({
+        indexName: 'email-index',
+        partitionKey: {
+          name: 'email',
+          type: dynamodb.AttributeType.STRING
+        }
+      });
+
     // Outputs
     new cdk.CfnOutput(this, `EventsTableName-${environment}`, {
       value: eventsTable.tableName,
@@ -36,6 +64,10 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, `RegistrationsTableName-${environment}`, {
       value: registrationsTable.tableName,
+    });
+
+    new cdk.CfnOutput(this, `UsersTableName-${environment}`, {
+      value: usersTable.tableName,
     });
   }
 }

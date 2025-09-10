@@ -35,9 +35,35 @@
      {
       "AttributeName": "userId",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "registeredAt",
+      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "registeredAt",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
     "KeySchema": [
      {
       "AttributeName": "eventId",
@@ -54,6 +80,48 @@
    "DeletionPolicy": "Retain",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackProd/RegistrationsTable-production/Resource"
+   }
+  },
+  "UsersTableproductionC4C4B6EE": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "anti-seattle-freeze-users-production"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackProd/UsersTable-production/Resource"
    }
   },
   "CDKMetadata": {
@@ -75,6 +143,11 @@
   "RegistrationsTableNameproduction": {
    "Value": {
     "Ref": "RegistrationsTableproduction33EE3291"
+   }
+  },
+  "UsersTableNameproduction": {
+   "Value": {
+    "Ref": "UsersTableproductionC4C4B6EE"
    }
   }
  },
