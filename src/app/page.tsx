@@ -10,11 +10,10 @@ export default function Home() {
     <main className="min-h-screen bg-black text-white">
       <UserStatusIcon />
       <div className="min-h-screen bg-black text-white flex flex-col">
-        {/* Header */}
-        <header className="w-full py-6 px-4">
+        <header className="w-full py-6 px-4 pt-16 md:pt-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Seattle Anti-Freeze
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent leading-tight">
+              Seattle<br className="block md:hidden" /> Anti-Freeze
             </h1>
           </div>
         </header>
