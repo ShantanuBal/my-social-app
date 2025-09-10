@@ -90,9 +90,9 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto">
           {/* Profile Info */}
           <div className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800">
-            <div className="flex items-start space-x-6">
+            <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
               {/* Avatar */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mx-auto md:mx-0">
                 {session.user?.image ? (
                   <img
                     src={session.user.image}
@@ -107,34 +107,36 @@ export default function ProfilePage() {
               </div>
 
               {/* User Info */}
-              <div className="flex-1">
+              <div className="flex-1 text-center md:text-left">
                 <h2 className="text-2xl font-bold text-white mb-2">
                   {session.user?.name || 'Anonymous User'}
                 </h2>
                 
                 <div className="space-y-2">
-                  <div className="flex items-center text-gray-300">
+                  <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <Mail className="w-4 h-4 mr-2" />
                     <span>{session.user?.email}</span>
                   </div>
                   
-                  <div className="flex items-center text-gray-300">
+                  <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <Calendar className="w-4 h-4 mr-2" />
                     <span>Member since {new Date().getFullYear()}</span>
                   </div>
                   
-                  <div className="flex items-center text-gray-300">
+                  <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <MapPin className="w-4 h-4 mr-2" />
                     <span>Seattle, WA</span>
                   </div>
                 </div>
               </div>
 
-              {/* Edit Button */}
-              <button className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
-                <Settings className="w-4 h-4 mr-2" />
-                Edit Profile
-              </button>
+              {/* Edit Button - Mobile responsive */}
+              <div className="flex justify-center md:justify-end">
+                <button className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors w-full md:w-auto justify-center">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </button>
+              </div>
             </div>
           </div>
 
