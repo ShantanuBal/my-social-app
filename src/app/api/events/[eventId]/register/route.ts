@@ -9,20 +9,23 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
-    const { name, age, gender, phoneNumber, email } = body;
+    const { name, age, gender, phoneNumber, email, userId } = body;
     const { eventId } = await params;
 
-    // Generate a unique user ID (you could make this more sophisticated)
-    const userId = `${email.replace('@', '_at_')}_${Date.now()}`;
+    // Determine user type and final userId
+    const isRegisteredUser = !!userId;
+    const finalUserId = userId || `${email.replace('@', '_at_')}_${Date.now()}`;
+    const userType = isRegisteredUser ? 'registered' : 'guest';
 
     // 1. Save registration
     await dynamodb.send(new PutCommand({
       TableName: config.aws.registrationsTable,
       Item: {
         eventId,
-        userId,
+        userId: finalUserId,
+        userType, // Add userType field
         name,
-        age: parseInt(age),
+        age: parseInt(age) || 0,
         gender,
         phoneNumber,
         email,

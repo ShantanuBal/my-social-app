@@ -23,6 +23,7 @@ export default function RegistrationModal({
   const { data: session, status } = useSession();
   const [showGuestForm, setShowGuestForm] = useState(false);
   const [formData, setFormData] = useState({
+    userId: '',
     name: '',
     age: '',
     gender: '',
@@ -57,6 +58,7 @@ export default function RegistrationModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: session.user.id,
           name: session.user.name,
           email: session.user.email,
           age: 0, // Use 0 for DynamoDB schema compatibility
@@ -110,6 +112,7 @@ export default function RegistrationModal({
     setShowGuestForm(false);
     setError('');
     setFormData({
+      userId: session?.user?.id || '',
       name: session?.user?.name || '',
       age: '',
       gender: '',
@@ -319,7 +322,7 @@ export default function RegistrationModal({
               Sign in for faster registration, or register as a guest.
             </p>
             
-            <div className="space-y-4">
+            <div className="space-y-8">
               <Link href="/auth/signin?callbackUrl=/events" onClick={handleClose}>
                 <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300">
                   Sign In to Register
@@ -328,7 +331,7 @@ export default function RegistrationModal({
               
               <button
                 onClick={() => setShowGuestForm(true)}
-                className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 mt-2"
               >
                 Register as Guest
               </button>
