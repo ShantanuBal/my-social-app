@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { User, Mail, Calendar, MapPin, LogOut, Settings } from 'lucide-react'
 import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
+import AppHeader from '../../components/AppHeader';
 
 interface UserRegistration {
   eventId: string
@@ -66,11 +67,10 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
+      <AppHeader />
+
       <header className="w-full py-8 px-4 border-b border-gray-800">
         <div className="max-w-4xl mx-auto">
-          <Link href="/" className="text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors">
-            ← Back to Home
-          </Link>
           <div className="flex items-center justify-between">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               My Profile

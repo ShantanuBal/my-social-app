@@ -2,13 +2,13 @@
 
 import React from 'react';
 import TeamFooter from '../components/TeamFooter';
-import UserStatusIcon from '../components/UserStatusIcon';
+import AppHeader from '../components/AppHeader';
 
 export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <UserStatusIcon />
+      <AppHeader />
       <div className="min-h-screen bg-black text-white flex flex-col">
         <header className="w-full py-6 px-4 pt-16 md:pt-6">
           <div className="max-w-6xl mx-auto">

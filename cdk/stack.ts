@@ -56,6 +56,14 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
           type: dynamodb.AttributeType.STRING
         }
       });
+    
+    usersTable.addGlobalSecondaryIndex({
+      indexName: 'name-index',
+      partitionKey: {
+        name: 'name',
+        type: dynamodb.AttributeType.STRING
+      }
+    });
 
     // Outputs
     new cdk.CfnOutput(this, `EventsTableName-${environment}`, {

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 import TeamFooter from '../../components/TeamFooter';
 import RegistrationModal from '../../components/RegistrationModal';
-import UserStatusIcon from '../../components/UserStatusIcon';
+import AppHeader from '../../components/AppHeader';
 
 interface Event {
   id: string;
@@ -95,17 +95,11 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <UserStatusIcon />
+      <AppHeader />
         <div className="min-h-screen bg-black text-white">
         {/* Header */}
         <header className="w-full py-8 px-4 border-b border-gray-800">
             <div className="max-w-6xl mx-auto">
-            <button 
-                onClick={() => window.location.href = '/'}
-                className="text-blue-400 hover:text-blue-300 mb-4 transition-colors"
-            >
-                ← Back to Home
-            </button>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                 Events in Seattle
             </h1>

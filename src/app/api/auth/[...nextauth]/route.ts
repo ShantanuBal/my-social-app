@@ -7,8 +7,8 @@ import { dynamodb } from '../../../../../lib/dynamodb'
 import { config } from '../../../../../lib/config'
 import bcrypt from 'bcryptjs'
 
-console.log('NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET ? 'EXISTS' : 'MISSING')
-console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
+// console.log('NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET ? 'EXISTS' : 'MISSING')
+// console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
 
 const handler = NextAuth({
   // Remove the adapter for now - use JWT sessions instead
