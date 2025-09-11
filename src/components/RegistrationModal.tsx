@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, User, Calendar, Phone, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { X, User, Calendar, Phone, Mail, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ export default function RegistrationModal({
   eventTitle,
   onSuccess 
 }: RegistrationModalProps) {
+  const { data: session, status } = useSession();
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -29,7 +32,52 @@ export default function RegistrationModal({
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Auto-fill email from session when component loads
+  useEffect(() => {
+    if (session?.user?.email) {
+      setFormData(prev => ({
+        ...prev,
+        email: session.user.email || '',
+        name: session.user.name || ''
+      }));
+    }
+  }, [session]);
+
+  const handleQuickRegister = async () => {
+    if (!session?.user?.email) return;
+    
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/events/${eventId}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: session.user.name || 'User',
+          email: session.user.email,
+          age: 0, // Send 0 int instead of "Not specified"
+          gender: '', // Send empty string instead of "Not specified"
+          phoneNumber: '' // Send empty string instead of "Not specified"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Registration failed');
+      }
+
+      setIsSuccess(true);
+      onSuccess();
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDetailedRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
@@ -47,7 +95,7 @@ export default function RegistrationModal({
         throw new Error('Registration failed');
       }
 
-      setIsSuccess(true);  // Show success message
+      setIsSuccess(true);
       onSuccess();
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -57,15 +105,14 @@ export default function RegistrationModal({
   };
 
   const handleClose = () => {
-    // Reset all state when closing
     setIsSuccess(false);
     setError('');
     setFormData({
-      name: '',
+      name: session?.user?.name || '',
       age: '',
       gender: '',
       phoneNumber: '',
-      email: ''
+      email: session?.user?.email || ''
     });
     onClose();
   };
@@ -79,9 +126,7 @@ export default function RegistrationModal({
         <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700 text-center">
           <div className="mb-6">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Success!</h2>
             <p className="text-gray-300 mb-2">You have successfully registered for</p>
@@ -101,7 +146,62 @@ export default function RegistrationModal({
     );
   }
 
-  // Registration form view
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700 text-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in - show sign in prompt
+  if (!session) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-white">Join Event</h2>
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Sign In Required</h3>
+            <p className="text-gray-400 mb-6">
+              Please sign in to register for events. It&apos;s quick and makes future registrations even faster!
+            </p>
+            
+            <div className="space-y-3">
+              <Link href="/auth/signin?callbackUrl=/events" onClick={handleClose}>
+                <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300">
+                  Sign In to Register
+                </button>
+              </Link>
+              
+              <button
+                onClick={() => {/* Show manual form */}}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+              >
+                Register as Guest
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Logged in - show quick registration option
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700">
@@ -122,107 +222,140 @@ export default function RegistrationModal({
           <p className="text-blue-400 font-semibold">{eventTitle}</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              <User className="w-4 h-4 inline mr-2" />
-              Full Name
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              placeholder="Enter your full name"
-            />
+        {/* Quick Registration for Logged In Users */}
+        <div className="mb-6">
+          <div className="bg-gray-800 rounded-lg p-4 mb-4">
+            <h3 className="text-white font-semibold mb-2 flex items-center">
+              <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
+              Quick Registration
+            </h3>
+            <p className="text-gray-400 text-sm mb-3">
+              Register instantly using your account information:
+            </p>
+            <div className="text-sm text-gray-300">
+              <p><strong>Name:</strong> {session.user?.name || 'Your Name'}</p>
+              <p><strong>Email:</strong> {session.user?.email}</p>
+            </div>
           </div>
-
-          {/* Age */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              <Calendar className="w-4 h-4 inline mr-2" />
-              Age
-            </label>
-            <input
-              type="number"
-              required
-              min="18"
-              max="99"
-              value={formData.age}
-              onChange={(e) => setFormData({...formData, age: e.target.value})}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              placeholder="Your age"
-            />
-          </div>
-
-          {/* Gender */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Gender
-            </label>
-            <select
-              required
-              value={formData.gender}
-              onChange={(e) => setFormData({...formData, gender: e.target.value})}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-            >
-              <option value="">Select gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="non-binary">Non-binary</option>
-              <option value="prefer-not-to-say">Prefer not to say</option>
-            </select>
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              <Phone className="w-4 h-4 inline mr-2" />
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              required
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              placeholder="(555) 123-4567"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              <Mail className="w-4 h-4 inline mr-2" />
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              placeholder="your.email@example.com"
-            />
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="text-red-400 text-sm">{error}</div>
-          )}
-
-          {/* Submit Button */}
+          
           <button
-            type="submit"
+            onClick={handleQuickRegister}
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 mb-4"
           >
-            {isSubmitting ? 'Registering...' : 'Join Event'}
+            {isSubmitting ? 'Registering...' : 'Register Now'}
           </button>
-        </form>
+        </div>
+
+        {/* Alternative: Detailed Registration */}
+        <div className="border-t border-gray-700 pt-4">
+          <details className="group">
+            <summary className="text-gray-300 text-sm cursor-pointer hover:text-white transition-colors">
+              Need to provide additional details? Click here
+            </summary>
+            
+            <form onSubmit={handleDetailedRegister} className="space-y-4 mt-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <User className="w-4 h-4 inline mr-2" />
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              {/* Age */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-2" />
+                  Age
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="18"
+                  max="99"
+                  value={formData.age}
+                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Your age"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Gender
+                </label>
+                <select
+                  required
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="non-binary">Non-binary</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Phone className="w-4 h-4 inline mr-2" />
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Mail className="w-4 h-4 inline mr-2" />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+              >
+                {isSubmitting ? 'Registering...' : 'Register with Details'}
+              </button>
+            </form>
+          </details>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="text-red-400 text-sm mt-4 text-center">{error}</div>
+        )}
       </div>
     </div>
   );
