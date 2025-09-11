@@ -21,6 +21,7 @@ export default function RegistrationModal({
   onSuccess 
 }: RegistrationModalProps) {
   const { data: session, status } = useSession();
+  const [showGuestForm, setShowGuestForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -56,9 +57,9 @@ export default function RegistrationModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: session.user.name || 'User',
+          name: session.user.name,
           email: session.user.email,
-          age: 0, // Send 0 int instead of "Not specified"
+          age: 0, // Use 0 for DynamoDB schema compatibility
           gender: '', // Send empty string instead of "Not specified"
           phoneNumber: '' // Send empty string instead of "Not specified"
         }),
@@ -106,6 +107,7 @@ export default function RegistrationModal({
 
   const handleClose = () => {
     setIsSuccess(false);
+    setShowGuestForm(false);
     setError('');
     setFormData({
       name: session?.user?.name || '',
@@ -157,8 +159,144 @@ export default function RegistrationModal({
     );
   }
 
-  // Not logged in - show sign in prompt
+  // Not logged in - show sign in prompt OR guest form
   if (!session) {
+    // Show guest registration form
+    if (showGuestForm) {
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">Register as Guest</h2>
+              <button
+                onClick={handleClose}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-300 text-sm">Registering for:</p>
+              <p className="text-blue-400 font-semibold">{eventTitle}</p>
+            </div>
+
+            <form onSubmit={handleDetailedRegister} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <User className="w-4 h-4 inline mr-2" />
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              {/* Age */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-2" />
+                  Age
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="18"
+                  max="99"
+                  value={formData.age}
+                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Your age"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Gender
+                </label>
+                <select
+                  required
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="non-binary">Non-binary</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Phone className="w-4 h-4 inline mr-2" />
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <Mail className="w-4 h-4 inline mr-2" />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="text-red-400 text-sm">{error}</div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
+              >
+                {isSubmitting ? 'Registering...' : 'Register for Event'}
+              </button>
+            </form>
+
+            {/* Back to Sign In Option */}
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setShowGuestForm(false)}
+                className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
+              >
+                ← Back to sign in options
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Show sign in prompt with guest option
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700">
@@ -176,12 +314,12 @@ export default function RegistrationModal({
             <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Sign In Required</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Join {eventTitle}</h3>
             <p className="text-gray-400 mb-6">
-              Please sign in to register for events. It&apos;s quick and makes future registrations even faster!
+              Sign in for faster registration, or register as a guest.
             </p>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Link href="/auth/signin?callbackUrl=/events" onClick={handleClose}>
                 <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300">
                   Sign In to Register
@@ -189,7 +327,7 @@ export default function RegistrationModal({
               </Link>
               
               <button
-                onClick={() => {/* Show manual form */}}
+                onClick={() => setShowGuestForm(true)}
                 className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300"
               >
                 Register as Guest
