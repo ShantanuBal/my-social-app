@@ -1,9 +1,10 @@
+// app/profile/[userId]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { User, Mail, Calendar, MapPin, UserPlus, ArrowLeft } from 'lucide-react';
+import { User, Mail, Calendar, MapPin, UserPlus, ArrowLeft, Users } from 'lucide-react';
 import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import TeamFooter from '../../../components/TeamFooter';
@@ -24,13 +25,31 @@ interface UserRegistration {
   registeredAt: string;
 }
 
+interface ConnectionUser {
+  id: string;
+  name: string;
+  email: string;
+  location?: string;
+  bio?: string;
+  memberSince: string;
+}
+
+interface Connection {
+  userId: string;
+  connectedAt: string;
+  status: string;
+  user: ConnectionUser;
+}
+
 export default function UserProfilePage() {
   const params = useParams();
   const { data: session } = useSession();
   const userId = params.userId as string;
   const [user, setUser] = useState<UserProfile | null>(null);
   const [registrations, setRegistrations] = useState<UserRegistration[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [connectionsLoading, setConnectionsLoading] = useState(true);
   const [error, setError] = useState('');
 
   // Check if this is the current user's profile
@@ -44,6 +63,7 @@ export default function UserProfilePage() {
     }
 
     fetchUserProfile();
+    fetchConnections();
   }, [userId, isOwnProfile]);
 
   const fetchUserProfile = async () => {
@@ -77,6 +97,22 @@ export default function UserProfilePage() {
     }
   };
 
+  const fetchConnections = async () => {
+    try {
+      setConnectionsLoading(true);
+      const response = await fetch(`/api/connections/${userId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setConnections(data.connections || []);
+      }
+    } catch (err) {
+      console.error('Error fetching connections:', err);
+    } finally {
+      setConnectionsLoading(false);
+    }
+  };
+
   const handleConnect = async () => {
     try {
       const response = await fetch(`/api/connections/connect`, {
@@ -87,6 +123,8 @@ export default function UserProfilePage() {
       
       if (response.ok) {
         setUser(prev => prev ? { ...prev, isConnected: true } : null);
+        // Refresh connections list to show the new connection
+        fetchConnections();
       }
     } catch (err) {
       console.error('Failed to connect:', err);
@@ -195,41 +233,128 @@ export default function UserProfilePage() {
             </div>
           </div>
 
-          {/* Recent Events */}
-          <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <h3 className="text-xl font-bold text-white mb-6">Recent Events</h3>
-            
-            {registrations.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-gray-600" />
+          {/* Two Column Layout for Events and Connections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Events */}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+              <h3 className="text-xl font-bold text-white mb-6">Recent Events</h3>
+              
+              {registrations.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-400">No recent events to show.</p>
                 </div>
-                <p className="text-gray-400">No recent events to show.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {registrations.slice(0, 5).map((registration, index) => (
-                  <div
-                    key={`${registration.eventId}-${index}`}
-                    className="bg-gray-800 rounded-lg p-4 border border-gray-700"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-white mb-1">
-                          {registration.eventTitle || `Event ${registration.eventId}`}
-                        </h4>
-                        <p className="text-gray-400 text-sm">
-                          Attended on {new Date(registration.registeredAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-green-400 text-sm font-medium">
-                        ✓ Attended
+              ) : (
+                <div className="space-y-4">
+                  {registrations.slice(0, 5).map((registration, index) => (
+                    <div
+                      key={`${registration.eventId}-${index}`}
+                      className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-white mb-1">
+                            {registration.eventTitle || `Event ${registration.eventId}`}
+                          </h4>
+                          <p className="text-gray-400 text-sm">
+                            Attended on {new Date(registration.registeredAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="text-green-400 text-sm font-medium">
+                          ✓ Attended
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Connections */}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+              <h3 className="text-xl font-bold text-white mb-6">
+                Connections
+                <span className="ml-2 text-sm font-normal text-gray-400">
+                  ({connections.length})
+                </span>
+              </h3>
+
+              {connectionsLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : connections.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-gray-600" />
                   </div>
-                ))}
-              </div>
-            )}
+                  <p className="text-gray-400">No connections yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {connections.slice(0, 6).map((connection) => (
+                    <Link
+                      key={connection.user.id}
+                      href={`/profile/${connection.user.id}`}
+                      className="block hover:bg-gray-800 rounded-lg p-3 transition-colors"
+                    >
+                      <div className="flex items-start space-x-3">
+                        {/* Profile Avatar */}
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-medium text-sm">
+                            {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-white truncate">
+                              {connection.user.name}
+                            </h4>
+                            <span className="text-xs text-gray-500">
+                              Connected {new Date(connection.connectedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          
+                          {connection.user.location && (
+                            <div className="flex items-center mt-1">
+                              <MapPin className="h-3 w-3 text-gray-400 mr-1" />
+                              <span className="text-xs text-gray-400">
+                                {connection.user.location}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {connection.user.bio && (
+                            <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                              {connection.user.bio}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  
+                  {connections.length > 6 && (
+                    <div className="text-center pt-4">
+                      <button className="text-blue-400 hover:text-blue-300 text-sm">
+                        View all {connections.length} connections
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

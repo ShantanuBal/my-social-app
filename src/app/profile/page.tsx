@@ -1,9 +1,10 @@
+// app/profile/page.tsx
 'use client'
 
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { User, Mail, Calendar, MapPin, LogOut, Settings } from 'lucide-react'
+import { User, Mail, Calendar, MapPin, LogOut, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
 import AppHeader from '../../components/AppHeader';
@@ -16,11 +17,29 @@ interface UserRegistration {
   email: string
 }
 
+interface ConnectionUser {
+  id: string;
+  name: string;
+  email: string;
+  location?: string;
+  bio?: string;
+  memberSince: string;
+}
+
+interface Connection {
+  userId: string;
+  connectedAt: string;
+  status: string;
+  user: ConnectionUser;
+}
+
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [registrations, setRegistrations] = useState<UserRegistration[]>([])
+  const [connections, setConnections] = useState<Connection[]>([])
   const [loading, setLoading] = useState(true)
+  const [connectionsLoading, setConnectionsLoading] = useState(true)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -30,8 +49,9 @@ export default function ProfilePage() {
       return
     }
 
-    // Fetch user's event registrations
+    // Fetch user's event registrations and connections
     fetchUserRegistrations()
+    fetchConnections()
   }, [session, status, router])
 
   const fetchUserRegistrations = async () => {
@@ -45,6 +65,24 @@ export default function ProfilePage() {
       console.error('Failed to fetch registrations:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchConnections = async () => {
+    try {
+      setConnectionsLoading(true)
+      if (session?.user?.id) {
+        const response = await fetch(`/api/connections/${session.user.id}`)
+        
+        if (response.ok) {
+          const data = await response.json()
+          setConnections(data.connections || [])
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching connections:', err)
+    } finally {
+      setConnectionsLoading(false)
     }
   }
 
@@ -140,54 +178,158 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Event Registrations */}
-          <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <h3 className="text-xl font-bold text-white mb-6">My Event Registrations</h3>
-            
-            {registrations.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-gray-600" />
-                </div>
-                <p className="text-gray-400 mb-4">You haven&apos;t registered for any events yet.</p>
-                <Link 
-                  href="/events"
-                  className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300"
-                >
-                  Browse Events
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {registrations.map((registration, index) => (
-                  <div
-                    key={`${registration.eventId}-${index}`}
-                    className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+          {/* Two Column Layout for Events and Connections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Event Registrations */}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+              <h3 className="text-xl font-bold text-white mb-6">My Event Registrations</h3>
+              
+              {registrations.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-400 mb-4">You haven&apos;t registered for any events yet.</p>
+                  <Link 
+                    href="/events"
+                    className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg font-semibold transition-all duration-300 text-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-white mb-1">
-                          {registration.eventTitle || `Event ${registration.eventId}`}
-                        </h4>
-                        <p className="text-gray-400 text-sm">
-                          Registered on {new Date(registration.registeredAt).toLocaleDateString()}
-                        </p>
-                        <p className="text-gray-500 text-sm">
-                          Registered as: {registration.name} ({registration.email})
-                        </p>
-                      </div>
-                      <div className="text-green-400 text-sm font-medium">
-                        ✓ Registered
+                    Browse Events
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {registrations.slice(0, 5).map((registration, index) => (
+                    <div
+                      key={`${registration.eventId}-${index}`}
+                      className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-white mb-1">
+                            {registration.eventTitle || `Event ${registration.eventId}`}
+                          </h4>
+                          <p className="text-gray-400 text-sm">
+                            Registered on {new Date(registration.registeredAt).toLocaleDateString()}
+                          </p>
+                          <p className="text-gray-500 text-sm">
+                            Registered as: {registration.name} ({registration.email})
+                          </p>
+                        </div>
+                        <div className="text-green-400 text-sm font-medium">
+                          ✓ Registered
+                        </div>
                       </div>
                     </div>
+                  ))}
+                  
+                  {registrations.length > 5 && (
+                    <div className="text-center pt-4">
+                      <button className="text-blue-400 hover:text-blue-300 text-sm">
+                        View all {registrations.length} registrations
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* My Connections */}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+              <h3 className="text-xl font-bold text-white mb-6">
+                My Connections
+                <span className="ml-2 text-sm font-normal text-gray-400">
+                  ({connections.length})
+                </span>
+              </h3>
+
+              {connectionsLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : connections.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-gray-600" />
                   </div>
-                ))}
-              </div>
-            )}
+                  <p className="text-gray-400 mb-4">You haven&apos;t made any connections yet.</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Use the search bar to find people and start connecting!
+                  </p>
+                  <Link 
+                    href="/events"
+                    className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg font-semibold transition-all duration-300 text-sm"
+                  >
+                    Meet People at Events
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {connections.slice(0, 6).map((connection) => (
+                    <Link
+                      key={connection.user.id}
+                      href={`/profile/${connection.user.id}`}
+                      className="block hover:bg-gray-800 rounded-lg p-3 transition-colors"
+                    >
+                      <div className="flex items-start space-x-3">
+                        {/* Profile Avatar */}
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-medium text-sm">
+                            {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-white truncate">
+                              {connection.user.name}
+                            </h4>
+                            <span className="text-xs text-gray-500">
+                              Connected {new Date(connection.connectedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          
+                          {connection.user.location && (
+                            <div className="flex items-center mt-1">
+                              <MapPin className="h-3 w-3 text-gray-400 mr-1" />
+                              <span className="text-xs text-gray-400">
+                                {connection.user.location}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {connection.user.bio && (
+                            <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                              {connection.user.bio}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  
+                  {connections.length > 6 && (
+                    <div className="text-center pt-4">
+                      <button className="text-blue-400 hover:text-blue-300 text-sm">
+                        View all {connections.length} connections
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 text-center">
               <div className="text-2xl font-bold text-blue-400 mb-2">
                 {registrations.length}
@@ -197,13 +339,20 @@ export default function ProfilePage() {
             
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 text-center">
               <div className="text-2xl font-bold text-purple-400 mb-2">
+                {connections.length}
+              </div>
+              <div className="text-gray-400">Connections</div>
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 text-center">
+              <div className="text-2xl font-bold text-green-400 mb-2">
                 {new Set(registrations.map(r => new Date(r.registeredAt).getMonth())).size}
               </div>
               <div className="text-gray-400">Active Months</div>
             </div>
             
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 text-center">
-              <div className="text-2xl font-bold text-green-400 mb-2">
+              <div className="text-2xl font-bold text-yellow-400 mb-2">
                 Seattle
               </div>
               <div className="text-gray-400">Location</div>
