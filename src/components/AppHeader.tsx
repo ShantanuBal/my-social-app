@@ -1,3 +1,4 @@
+// components/AppHeader.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -121,7 +122,7 @@ export default function AppHeader() {
             {/* Just a clickable area to go home - no icon */}
           </Link>
 
-          {/* Navigation Tabs */}
+          {/* Desktop Navigation Tabs */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               href="/"
@@ -148,8 +149,35 @@ export default function AppHeader() {
             </Link>
           </nav>
 
+          {/* Mobile Navigation - Icon Only */}
+          <nav className="md:hidden flex items-center space-x-4">
+            <Link 
+              href="/"
+              className={`p-2 rounded-md transition-colors ${
+                isActivePage('/') 
+                  ? 'bg-gray-800 text-white' 
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`}
+              title="Home"
+            >
+              <Home className="w-5 h-5" />
+            </Link>
+            
+            <Link 
+              href="/events"
+              className={`p-2 rounded-md transition-colors ${
+                isActivePage('/events') 
+                  ? 'bg-gray-800 text-white' 
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`}
+              title="Events"
+            >
+              <Calendar className="w-5 h-5" />
+            </Link>
+          </nav>
+
           {/* Search Bar */}
-          <div className="flex-1 max-w-lg mx-8 relative" ref={searchRef}>
+          <div className="flex-1 max-w-lg mx-4 md:mx-8 relative" ref={searchRef}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -247,37 +275,6 @@ export default function AppHeader() {
                 </button>
               </Link>
             )}
-          </div>
-
-          {/* Mobile Navigation Toggle */}
-          <div className="md:hidden">
-            {/* TODO: Add mobile menu toggle */}
-          </div>
-        </div>
-
-        {/* Mobile Navigation (hidden by default) */}
-        <div className="md:hidden border-t border-gray-700">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            <Link 
-              href="/"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActivePage('/') 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/events"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActivePage('/events') 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Events
-            </Link>
           </div>
         </div>
       </div>
