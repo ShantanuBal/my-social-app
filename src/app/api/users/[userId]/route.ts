@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dynamodb } from '../../../../../lib/dynamodb';
-import { GetCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { config } from '../../../../../lib/config';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 export async function GET(
   request: NextRequest,
@@ -25,6 +27,31 @@ export async function GET(
       );
     }
 
+    // Get current session to check connection status
+    const session = await getServerSession(authOptions);
+    const currentUserId = session?.user.id;
+    
+    let isConnected: boolean = false;
+    
+    // Check connection status if user is logged in
+    if (currentUserId && currentUserId !== userId) {
+      try {
+        const connectionCheck = await dynamodb.send(new QueryCommand({
+          TableName: config.aws.connectionsTable,
+          KeyConditionExpression: 'userId = :userId AND connectedUserId = :connectedUserId',
+          ExpressionAttributeValues: {
+            ':userId': currentUserId,
+            ':connectedUserId': userId
+          }
+        }));
+        
+        isConnected = !!(connectionCheck.Items && connectionCheck.Items.length > 0);
+      } catch (error) {
+        console.error('Error checking connection status:', error);
+        // isConnected remains false if check fails
+      }
+    }
+
     // Return public profile information
     const userProfile = {
       id: result.Item.id,
@@ -33,7 +60,7 @@ export async function GET(
       avatar: result.Item.avatar || null,
       location: result.Item.location || 'Seattle, WA',
       memberSince: result.Item.createdAt ? new Date(result.Item.createdAt).getFullYear() : new Date().getFullYear(),
-      isConnected: false // TODO: Check actual connection status with current user
+      isConnected
     };
 
     return NextResponse.json(userProfile);
