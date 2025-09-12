@@ -15,7 +15,10 @@
     "cdk:diff": "cdk diff",
     "seed-events": "tsx scripts/seed-events.ts",
     "seed-local": "NODE_ENV=development tsx scripts/seed-events.ts",
-    "seed-prod": "NODE_ENV=production tsx scripts/seed-events.ts"
+    "seed-prod": "NODE_ENV=production tsx scripts/seed-events.ts",
+    "seed-users": "tsx scripts/seed-users.ts",
+    "seed-users-local": "NODE_ENV=development tsx scripts/seed-users.ts",
+    "seed-users-prod": "NODE_ENV=production tsx scripts/seed-users.ts"
   },
   "dependencies": {
     "@auth/dynamodb-adapter": "^2.10.0",
