@@ -1,16 +1,16 @@
 {
   "version": "48.0.0",
   "files": {
-    "1853f8c31e4fe69d022d53349ee0e53124055910ca89c1dec4574f85ab0b87fd": {
+    "df7beff560894056b2ea8dec4e312b76c7fb458704ca33ba17e32295f5309f2b": {
       "displayName": "AntiSeattleFreezeStackLocal Template",
       "source": {
         "path": "AntiSeattleFreezeStackLocal.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "228130335524-us-west-2-d9436417": {
+        "228130335524-us-west-2-52f0c12e": {
           "bucketName": "cdk-hnb659fds-assets-228130335524-us-west-2",
-          "objectKey": "1853f8c31e4fe69d022d53349ee0e53124055910ca89c1dec4574f85ab0b87fd.json",
+          "objectKey": "df7beff560894056b2ea8dec4e312b76c7fb458704ca33ba17e32295f5309f2b.json",
           "region": "us-west-2",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-file-publishing-role-228130335524-us-west-2"
         }

@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth'
+import NextAuth, { AuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import FacebookProvider from 'next-auth/providers/facebook'
 import CredentialsProvider from 'next-auth/providers/credentials'
@@ -10,7 +10,7 @@ import bcrypt from 'bcryptjs'
 // console.log('NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET ? 'EXISTS' : 'MISSING')
 // console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   // Remove the adapter for now - use JWT sessions instead
   providers: [
     GoogleProvider({
@@ -72,25 +72,35 @@ const handler = NextAuth({
     })
   ],
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
   },
   pages: {
     signIn: '/auth/signin',
   },
   callbacks: {
     async jwt({ token, user }) {
+      // console.log('JWT callback - user:', user);
+      // console.log('JWT callback - token before:', token);
+
       if (user) {
         token.id = user.id
       }
+      // console.log('JWT callback - token after:', token);
       return token
     },
     async session({ session, token }) {
+      // console.log('Session callback - token:', token);
+      // console.log('Session callback - session before:', session);
+
       if (token && session.user) {
         session.user.id = token.id as string
       }
+      // console.log('Session callback - session after:', session);
       return session
     },
   },
-})
+}
 
-export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

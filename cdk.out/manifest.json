@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-deploy-role-228130335524-us-west-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-cfn-exec-role-228130335524-us-west-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-228130335524-us-west-2/1853f8c31e4fe69d022d53349ee0e53124055910ca89c1dec4574f85ab0b87fd.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-228130335524-us-west-2/df7beff560894056b2ea8dec4e312b76c7fb458704ca33ba17e32295f5309f2b.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -95,6 +95,20 @@
             "data": "UsersTablelocalC6C21C46"
           }
         ],
+        "/AntiSeattleFreezeStackLocal/ConnectionsTable-local": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "ConnectionsTablelocal4D31B503"
+            }
+          }
+        ],
+        "/AntiSeattleFreezeStackLocal/ConnectionsTable-local/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConnectionsTablelocal4D31B503"
+          }
+        ],
         "/AntiSeattleFreezeStackLocal/EventsTableName-local": [
           {
             "type": "aws:cdk:logicalId",
@@ -111,6 +125,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UsersTableNamelocal"
+          }
+        ],
+        "/AntiSeattleFreezeStackLocal/ConnectionsTableName-local": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConnectionsTableNamelocal"
           }
         ],
         "/AntiSeattleFreezeStackLocal/CDKMetadata/Default": [
@@ -155,7 +175,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-deploy-role-228130335524-us-west-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::228130335524:role/cdk-hnb659fds-cfn-exec-role-228130335524-us-west-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-228130335524-us-west-2/7d54067128e3ce784244f5a254701a115c2ded7274560d32d08017fd853c0526.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-228130335524-us-west-2/7a28768015ed1cb102a1d1aec72dfc738132c2fd38f0b693c251b12b22c3d0dd.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -228,6 +248,20 @@
             "data": "UsersTableproductionC4C4B6EE"
           }
         ],
+        "/AntiSeattleFreezeStackProd/ConnectionsTable-production": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "ConnectionsTableproductionFFA77CC0"
+            }
+          }
+        ],
+        "/AntiSeattleFreezeStackProd/ConnectionsTable-production/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConnectionsTableproductionFFA77CC0"
+          }
+        ],
         "/AntiSeattleFreezeStackProd/EventsTableName-production": [
           {
             "type": "aws:cdk:logicalId",
@@ -244,6 +278,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UsersTableNameproduction"
+          }
+        ],
+        "/AntiSeattleFreezeStackProd/ConnectionsTableName-production": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConnectionsTableNameproduction"
           }
         ],
         "/AntiSeattleFreezeStackProd/CDKMetadata/Default": [

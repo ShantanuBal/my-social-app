@@ -1,6 +1,6 @@
-export const getTableName = (tableType: 'events' | 'registrations' | 'users') => {
+export const getTableName = (tableType: 'events' | 'registrations' | 'users' | 'connections') => {
   const environment = process.env.NODE_ENV === 'production' ? 'production' : 'local';
-  return `anti-seattle-freeze-${tableType}-${environment}`;
+  return `${tableType}-${environment}`;
 };
 
 export const config = {
@@ -9,5 +9,6 @@ export const config = {
     eventsTable: getTableName('events'),
     registrationsTable: getTableName('registrations'),
     usersTable: getTableName('users'),
+    connectionsTable: getTableName('connections'),
   }
 };

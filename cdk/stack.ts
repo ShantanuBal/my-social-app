@@ -14,7 +14,7 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
 
     // Events table
     const eventsTable = new dynamodb.Table(this, `EventsTable-${environment}`, {
-      tableName: `anti-seattle-freeze-events-${environment}`,
+      tableName: `events-${environment}`,
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
@@ -22,7 +22,7 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
 
     // Registrations table
     const registrationsTable = new dynamodb.Table(this, `RegistrationsTable-${environment}`, {
-      tableName: `anti-seattle-freeze-registrations-${environment}`,
+      tableName: `registrations-${environment}`,
       partitionKey: { name: 'eventId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -43,7 +43,7 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
 
     // Users table
     const usersTable = new dynamodb.Table(this, `UsersTable-${environment}`, {
-      tableName: `anti-seattle-freeze-users-${environment}`,
+      tableName: `users-${environment}`,
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
@@ -65,6 +65,28 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
       }
     });
 
+    // Connections table
+    const connectionsTable = new dynamodb.Table(this, `ConnectionsTable-${environment}`, {
+      tableName: `connections-${environment}`,
+      partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'connectedUserId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+    });
+
+    // GSI to query connections in reverse (who is connected to a specific user)
+    connectionsTable.addGlobalSecondaryIndex({
+      indexName: 'connected-user-index',
+      partitionKey: {
+        name: 'connectedUserId',
+        type: dynamodb.AttributeType.STRING
+      },
+      sortKey: {
+        name: 'userId',
+        type: dynamodb.AttributeType.STRING
+      }
+    });
+
     // Outputs
     new cdk.CfnOutput(this, `EventsTableName-${environment}`, {
       value: eventsTable.tableName,
@@ -76,6 +98,10 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, `UsersTableName-${environment}`, {
       value: usersTable.tableName,
+    });
+
+    new cdk.CfnOutput(this, `ConnectionsTableName-${environment}`, {
+      value: connectionsTable.tableName,
     });
   }
 }

@@ -16,7 +16,7 @@
       "KeyType": "HASH"
      }
     ],
-    "TableName": "anti-seattle-freeze-events-production"
+    "TableName": "events-production"
    },
    "UpdateReplacePolicy": "Retain",
    "DeletionPolicy": "Retain",
@@ -74,7 +74,7 @@
       "KeyType": "RANGE"
      }
     ],
-    "TableName": "anti-seattle-freeze-registrations-production"
+    "TableName": "registrations-production"
    },
    "UpdateReplacePolicy": "Retain",
    "DeletionPolicy": "Retain",
@@ -93,6 +93,10 @@
      {
       "AttributeName": "email",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "name",
+      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
@@ -108,6 +112,18 @@
       "Projection": {
        "ProjectionType": "ALL"
       }
+     },
+     {
+      "IndexName": "name-index",
+      "KeySchema": [
+       {
+        "AttributeName": "name",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
      }
     ],
     "KeySchema": [
@@ -116,12 +132,62 @@
       "KeyType": "HASH"
      }
     ],
-    "TableName": "anti-seattle-freeze-users-production"
+    "TableName": "users-production"
    },
    "UpdateReplacePolicy": "Retain",
    "DeletionPolicy": "Retain",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackProd/UsersTable-production/Resource"
+   }
+  },
+  "ConnectionsTableproductionFFA77CC0": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "connectedUserId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "connected-user-index",
+      "KeySchema": [
+       {
+        "AttributeName": "connectedUserId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "userId",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "userId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "connectedUserId",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "connections-production"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackProd/ConnectionsTable-production/Resource"
    }
   },
   "CDKMetadata": {
@@ -148,6 +214,11 @@
   "UsersTableNameproduction": {
    "Value": {
     "Ref": "UsersTableproductionC4C4B6EE"
+   }
+  },
+  "ConnectionsTableNameproduction": {
+   "Value": {
+    "Ref": "ConnectionsTableproductionFFA77CC0"
    }
   }
  },

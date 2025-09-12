@@ -16,7 +16,7 @@
       "KeyType": "HASH"
      }
     ],
-    "TableName": "anti-seattle-freeze-events-local"
+    "TableName": "events-local"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -74,7 +74,7 @@
       "KeyType": "RANGE"
      }
     ],
-    "TableName": "anti-seattle-freeze-registrations-local"
+    "TableName": "registrations-local"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -93,6 +93,10 @@
      {
       "AttributeName": "email",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "name",
+      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
@@ -108,6 +112,18 @@
       "Projection": {
        "ProjectionType": "ALL"
       }
+     },
+     {
+      "IndexName": "name-index",
+      "KeySchema": [
+       {
+        "AttributeName": "name",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
      }
     ],
     "KeySchema": [
@@ -116,12 +132,62 @@
       "KeyType": "HASH"
      }
     ],
-    "TableName": "anti-seattle-freeze-users-local"
+    "TableName": "users-local"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "AntiSeattleFreezeStackLocal/UsersTable-local/Resource"
+   }
+  },
+  "ConnectionsTablelocal4D31B503": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "connectedUserId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "connected-user-index",
+      "KeySchema": [
+       {
+        "AttributeName": "connectedUserId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "userId",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "userId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "connectedUserId",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "connections-local"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AntiSeattleFreezeStackLocal/ConnectionsTable-local/Resource"
    }
   },
   "CDKMetadata": {
@@ -148,6 +214,11 @@
   "UsersTableNamelocal": {
    "Value": {
     "Ref": "UsersTablelocalC6C21C46"
+   }
+  },
+  "ConnectionsTableNamelocal": {
+   "Value": {
+    "Ref": "ConnectionsTablelocal4D31B503"
    }
   }
  },

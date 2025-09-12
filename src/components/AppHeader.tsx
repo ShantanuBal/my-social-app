@@ -75,8 +75,31 @@ export default function AppHeader() {
   };
 
   const handleConnectUser = async (userId: string) => {
-    // TODO: Implement connection logic
-    console.log('Connecting to user:', userId);
+    try {
+      const response = await fetch('/api/connections/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (response.ok) {
+        // Update the search results to show connected status
+        setSearchResults(prev => 
+          prev.map(user => 
+            user.id === userId 
+              ? { ...user, isConnected: true }
+              : user
+          )
+        );
+      } else {
+        const error = await response.json();
+        console.error('Failed to connect:', error.error);
+      }
+    } catch (error) {
+      console.error('Connection error:', error);
+    }
   };
 
   const handleInviteUser = async (userId: string) => {
@@ -149,44 +172,22 @@ export default function AppHeader() {
                 ) : searchResults.length > 0 ? (
                   <div className="py-2">
                     {searchResults.map((user) => (
-                      <div key={user.id} className="px-4 py-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0">
-                        <div className="flex items-center justify-between">
-                          <Link 
-                            href={`/profile/${user.id}`}
-                            className="flex items-center space-x-3 flex-1"
-                            onClick={() => setShowSearchResults(false)}
-                          >
-                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                              <User className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-white font-medium">{user.name}</p>
-                              <p className="text-gray-400 text-sm">{user.email}</p>
-                            </div>
-                          </Link>
-                          
-                          <div className="flex items-center space-x-2">
-                            {user.isConnected ? (
-                              <span className="text-green-400 text-xs">Connected</span>
-                            ) : (
-                              <button
-                                onClick={() => handleConnectUser(user.id)}
-                                className="text-blue-400 hover:text-blue-300 p-1"
-                                title="Connect"
-                              >
-                                <UserPlus className="w-4 h-4" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleInviteUser(user.id)}
-                              className="text-purple-400 hover:text-purple-300 p-1"
-                              title="Invite to Event"
-                            >
-                              <Mail className="w-4 h-4" />
-                            </button>
+                      <Link 
+                        key={user.id}
+                        href={`/profile/${user.id}`}
+                        onClick={() => setShowSearchResults(false)}
+                        className="block px-4 py-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <User className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">{user.name}</p>
+                            <p className="text-gray-400 text-sm">{user.email}</p>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : searchQuery.length > 0 ? (
