@@ -16,6 +16,7 @@ interface UserProfile {
   avatar?: string;
   location?: string;
   memberSince?: string;
+  profilePrivacy?: 'public' | 'private';
 }
 
 interface UserRegistration {
@@ -205,6 +206,28 @@ export default function ProfilePage() {
     }
   }
 
+  const handlePrivacyToggle = async () => {
+    if (!userProfile?.id) return
+    
+    const newPrivacySetting = userProfile.profilePrivacy === 'private' ? 'public' : 'private'
+    
+    try {
+      const response = await fetch('/api/user/privacy', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privacy: newPrivacySetting }),
+      })
+      
+      if (response.ok) {
+        setUserProfile(prev => prev ? { ...prev, profilePrivacy: newPrivacySetting } : null)
+      } else {
+        console.error('Failed to update privacy setting')
+      }
+    } catch (err) {
+      console.error('Error updating privacy:', err)
+    }
+  }
+
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' })
   }
@@ -286,8 +309,32 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Edit Button */}
-              <div className="flex justify-center md:justify-end">
+              {/* Edit Button and Privacy Toggle */}
+              <div className="flex flex-col justify-center md:justify-end space-y-3">
+                {/* Privacy Toggle */}
+                <div className="flex items-center justify-center md:justify-end space-x-3">
+                  <span className="text-sm text-gray-400">
+                    {userProfile?.profilePrivacy === 'private' ? 'Private' : 'Public'} Profile
+                  </span>
+                  <button
+                    onClick={handlePrivacyToggle}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      userProfile?.profilePrivacy === 'private' 
+                        ? 'bg-red-600' 
+                        : 'bg-green-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        userProfile?.profilePrivacy === 'private' 
+                          ? 'translate-x-1' 
+                          : 'translate-x-6'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Edit Button */}
                 <button className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors w-full md:w-auto justify-center">
                   <Settings className="w-4 h-4 mr-2" />
                   Edit Profile

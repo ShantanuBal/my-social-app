@@ -16,6 +16,7 @@ interface UserProfile {
   avatar?: string;
   location?: string;
   memberSince?: string;
+  profilePrivacy?: 'public' | 'private';
 }
 
 interface UserRegistration {
@@ -98,6 +99,7 @@ export default function UserProfilePage() {
       }
       const userData = await userResponse.json();
       setUser(userData);
+      console.log("Fetched user userData: ", userData)
 
       // Fetch user's public registrations (optional)
       try {
@@ -105,6 +107,7 @@ export default function UserProfilePage() {
         if (registrationsResponse.ok) {
           const registrationsData = await registrationsResponse.json();
           setRegistrations(registrationsData);
+          console.log("Fetched registrationsData: ", registrationsData)
         }
       } catch (err) {
         console.log('Could not load user registrations');
@@ -261,6 +264,7 @@ export default function UserProfilePage() {
                     <span>Member since {user.memberSince || new Date().getFullYear()}</span>
                   </div>
                   
+
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <MapPin className="w-4 h-4 mr-2" />
                     <span>{user.location || 'Seattle, WA'}</span>
@@ -281,7 +285,15 @@ export default function UserProfilePage() {
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-6">Recent Events</h3>
               
-              {registrations.length === 0 ? (
+              {user.profilePrivacy === 'private' ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-400">This user has a private profile.</p>
+                  <p className="text-gray-500 text-sm mt-2">Event information is not publicly visible.</p>
+                </div>
+              ) : registrations.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Calendar className="w-8 h-8 text-gray-600" />

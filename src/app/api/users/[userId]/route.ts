@@ -52,7 +52,8 @@ export async function GET(
       }
     }
 
-    console.log(result.Item.createdAt)
+    console.log("Created at: ", result.Item.createdAt)
+    console.log("profilePrivacy: ", result.Item.profilePrivacy)
 
     // Return public profile information
     const userProfile = {
@@ -62,6 +63,7 @@ export async function GET(
       avatar: result.Item.avatar || null,
       location: result.Item.location,
       memberSince: new Date(result.Item.createdAt).getFullYear(),
+      profilePrivacy: result.Item.profilePrivacy || 'public', // Default to public if not set
       isConnected
     };
 
