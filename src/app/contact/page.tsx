@@ -106,10 +106,10 @@ export default function ContactPage() {
                       Have questions or want to chat? Reach out directly:
                     </p>
                     <a 
-                      href="mailto:shantanu.r.bal@gmail.com"
+                      href="mailto:the.seattle.anti.freeze@gmail.com"
                       className="text-blue-400 hover:text-blue-300 transition-colors"
                     >
-                      shantanu.r.bal@gmail.com
+                      the.seattle.anti.freeze@gmail.com
                     </a>
                   </div>
                 </div>
