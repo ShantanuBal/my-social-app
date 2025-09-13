@@ -209,7 +209,7 @@ export default function ContactPage() {
                 Find Events Near You
               </Link>
               <a 
-                href="mailto:shantanu.r.bal@gmail.com"
+                href="mailto:the.seattle.anti.freeze@gmail.com"
                 className="bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors border border-gray-600"
               >
                 Get in Touch
