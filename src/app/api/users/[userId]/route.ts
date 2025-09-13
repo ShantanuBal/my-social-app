@@ -52,14 +52,16 @@ export async function GET(
       }
     }
 
+    console.log(result.Item.createdAt)
+
     // Return public profile information
     const userProfile = {
       id: result.Item.id,
       name: result.Item.name,
       email: result.Item.email,
       avatar: result.Item.avatar || null,
-      location: result.Item.location || 'Seattle, WA',
-      memberSince: result.Item.createdAt ? new Date(result.Item.createdAt).getFullYear() : new Date().getFullYear(),
+      location: result.Item.location,
+      memberSince: new Date(result.Item.createdAt).getFullYear(),
       isConnected
     };
 

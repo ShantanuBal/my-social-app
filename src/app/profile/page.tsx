@@ -4,10 +4,19 @@
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { User, Mail, Calendar, MapPin, LogOut, Settings, Users } from 'lucide-react'
+import { User, Mail, Calendar, MapPin, LogOut, Settings, Users, UserCheck, UserX, Clock } from 'lucide-react'
 import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
 import AppHeader from '../../components/AppHeader';
+
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  location?: string;
+  memberSince?: string;
+}
 
 interface UserRegistration {
   eventId: string
@@ -33,13 +42,35 @@ interface Connection {
   user: ConnectionUser;
 }
 
+interface PendingRequest {
+  requestId: string;
+  requesterId: string;
+  requestedAt: string;
+  status: string;
+  user: ConnectionUser;
+}
+
+interface PendingOutgoingRequest {
+  requestId: string;
+  recipientId: string;
+  requestedAt: string;
+  status: string;
+  user: ConnectionUser;
+}
+
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [registrations, setRegistrations] = useState<UserRegistration[]>([])
   const [connections, setConnections] = useState<Connection[]>([])
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([])
+  const [outgoingRequests, setOutgoingRequests] = useState<PendingOutgoingRequest[]>([])
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(true)
   const [connectionsLoading, setConnectionsLoading] = useState(true)
+  const [pendingLoading, setPendingLoading] = useState(true)
+  const [outgoingLoading, setOutgoingLoading] = useState(true)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -49,10 +80,31 @@ export default function ProfilePage() {
       return
     }
 
-    // Fetch user's event registrations and connections
+    // Only fetch data once when component mounts and session is ready
+    fetchUserProfile()
     fetchUserRegistrations()
     fetchConnections()
-  }, [session, status, router])
+    fetchPendingRequests()
+    fetchOutgoingRequests()
+  }, [status])
+
+  const fetchUserProfile = async () => {
+    try {
+      setProfileLoading(true)
+      if (session?.user?.id) {
+        const response = await fetch(`/api/users/${session.user.id}`)
+        
+        if (response.ok) {
+          const userData = await response.json()
+          setUserProfile(userData)
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err)
+    } finally {
+      setProfileLoading(false)
+    }
+  }
 
   const fetchUserRegistrations = async () => {
     try {
@@ -86,11 +138,78 @@ export default function ProfilePage() {
     }
   }
 
+  const fetchPendingRequests = async () => {
+    try {
+      setPendingLoading(true)
+      const response = await fetch('/api/connections/pending')
+      
+      if (response.ok) {
+        const data = await response.json()
+        setPendingRequests(data.requests || [])
+      }
+    } catch (err) {
+      console.error('Error fetching pending requests:', err)
+    } finally {
+      setPendingLoading(false)
+    }
+  }
+
+  const fetchOutgoingRequests = async () => {
+    try {
+      setOutgoingLoading(true)
+      if (session?.user?.id) {
+        const response = await fetch(`/api/connections/outgoing`)
+        
+        if (response.ok) {
+          const data = await response.json()
+          setOutgoingRequests(data.requests || [])
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching outgoing requests:', err)
+    } finally {
+      setOutgoingLoading(false)
+    }
+  }
+
+  const handleAcceptRequest = async (requesterId: string) => {
+    try {
+      const response = await fetch('/api/connections/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: requesterId }),
+      })
+      
+      if (response.ok) {
+        setPendingRequests(prev => prev.filter(req => req.requesterId !== requesterId))
+        fetchConnections()
+      }
+    } catch (err) {
+      console.error('Failed to accept request:', err)
+    }
+  }
+
+  const handleIgnoreRequest = async (requesterId: string) => {
+    try {
+      const response = await fetch('/api/connections/ignore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: requesterId }),
+      })
+      
+      if (response.ok) {
+        setPendingRequests(prev => prev.filter(req => req.requesterId !== requesterId))
+      }
+    } catch (err) {
+      console.error('Failed to ignore request:', err)
+    }
+  }
+
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' })
   }
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading' || loading || profileLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-xl">Loading...</div>
@@ -104,7 +223,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
       <AppHeader />
 
       <header className="w-full py-8 px-4 border-b border-gray-800">
@@ -131,10 +249,10 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
               {/* Avatar */}
               <div className="flex-shrink-0 mx-auto md:mx-0">
-                {session.user?.image ? (
+                {userProfile?.avatar ? (
                   <img
-                    src={session.user.image}
-                    alt={session.user.name || 'User'}
+                    src={userProfile.avatar}
+                    alt={userProfile.name || 'User'}
                     className="w-20 h-20 rounded-full"
                   />
                 ) : (
@@ -147,28 +265,28 @@ export default function ProfilePage() {
               {/* User Info */}
               <div className="flex-1 text-center md:text-left">
                 <h2 className="text-2xl font-bold text-white mb-2">
-                  {session.user?.name || 'Anonymous User'}
+                  {userProfile?.name || session?.user?.name}
                 </h2>
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <Mail className="w-4 h-4 mr-2" />
-                    <span>{session.user?.email}</span>
+                    <span>{userProfile?.email || session?.user?.email}</span>
                   </div>
                   
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <Calendar className="w-4 h-4 mr-2" />
-                    <span>Member since {new Date().getFullYear()}</span>
+                    <span>Member since {userProfile?.memberSince}</span>
                   </div>
                   
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span>Seattle, WA</span>
+                    <span>{userProfile?.location || 'Earth'}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Edit Button - Mobile responsive */}
+              {/* Edit Button */}
               <div className="flex justify-center md:justify-end">
                 <button className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors w-full md:w-auto justify-center">
                   <Settings className="w-4 h-4 mr-2" />
@@ -177,6 +295,169 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* Pending Incoming Connection Requests */}
+          {pendingRequests.length > 0 && (
+            <div className="bg-orange-900/20 border border-orange-600/30 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-bold text-orange-300 mb-4">
+                <Clock className="w-5 h-5 inline mr-2" />
+                Pending Connection Requests
+                <span className="ml-2 text-sm font-normal text-orange-400">
+                  ({pendingRequests.length})
+                </span>
+              </h3>
+              
+              {pendingLoading ? (
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="animate-pulse flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <div className="w-20 h-8 bg-gray-700 rounded"></div>
+                        <div className="w-20 h-8 bg-gray-700 rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pendingRequests.map((request) => (
+                    <div
+                      key={request.requestId}
+                      className="bg-gray-800/50 rounded-lg p-4 border border-gray-700"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-medium text-sm">
+                              {request.user.name?.charAt(0)?.toUpperCase() || '?'}
+                            </span>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center">
+                              <h4 className="text-sm font-medium text-white truncate">
+                                {request.user.name}
+                              </h4>
+                              <span className="ml-2 text-xs text-orange-400">
+                                wants to connect
+                              </span>
+                            </div>
+                            
+                            <p className="text-xs text-gray-400 mt-1">
+                              {request.user.email}
+                            </p>
+                            
+                            {request.user.location && (
+                              <div className="flex items-center mt-1">
+                                <MapPin className="h-3 w-3 text-gray-400 mr-1" />
+                                <span className="text-xs text-gray-400">
+                                  {request.user.location}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex space-x-2 ml-4">
+                          <button
+                            onClick={() => handleAcceptRequest(request.requesterId)}
+                            className="flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-md transition-colors text-sm"
+                          >
+                            <UserCheck className="w-4 h-4 mr-1" />
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleIgnoreRequest(request.requesterId)}
+                            className="flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md transition-colors text-sm"
+                          >
+                            <UserX className="w-4 h-4 mr-1" />
+                            Ignore
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Outgoing Connection Requests */}
+          {outgoingRequests.length > 0 && (
+            <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-bold text-blue-300 mb-4">
+                <Clock className="w-5 h-5 inline mr-2" />
+                Sent Connection Requests
+                <span className="ml-2 text-sm font-normal text-blue-400">
+                  ({outgoingRequests.length})
+                </span>
+              </h3>
+              
+              {outgoingLoading ? (
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="animate-pulse flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {outgoingRequests.map((request) => (
+                    <div
+                      key={request.requestId}
+                      className="bg-gray-800/50 rounded-lg p-4 border border-gray-700"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-medium text-sm">
+                            {request.user.name?.charAt(0)?.toUpperCase() || '?'}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center">
+                            <h4 className="text-sm font-medium text-white truncate">
+                              {request.user.name}
+                            </h4>
+                            <span className="ml-2 text-xs text-blue-400">
+                              request sent
+                            </span>
+                          </div>
+                          
+                          <p className="text-xs text-gray-400 mt-1">
+                            {request.user.email}
+                          </p>
+                          
+                          {request.user.location && (
+                            <div className="flex items-center mt-1">
+                              <MapPin className="h-3 w-3 text-gray-400 mr-1" />
+                              <span className="text-xs text-gray-400">
+                                {request.user.location}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="text-xs text-gray-500">
+                          Sent {new Date(request.requestedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Two Column Layout for Events and Connections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -280,7 +561,6 @@ export default function ProfilePage() {
                       className="block hover:bg-gray-800 rounded-lg p-3 transition-colors"
                     >
                       <div className="flex items-start space-x-3">
-                        {/* Profile Avatar */}
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white font-medium text-sm">
                             {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
@@ -361,7 +641,6 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      {/* Footer */}
       <TeamFooter />
     </div>
   )

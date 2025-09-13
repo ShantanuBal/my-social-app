@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { User, Mail, Calendar, MapPin, UserPlus, ArrowLeft, Users } from 'lucide-react';
+import { User, Mail, Calendar, MapPin, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import TeamFooter from '../../../components/TeamFooter';
@@ -16,7 +16,6 @@ interface UserProfile {
   avatar?: string;
   location?: string;
   memberSince?: string;
-  isConnected?: boolean;
 }
 
 interface UserRegistration {
@@ -43,11 +42,12 @@ interface Connection {
 
 export default function UserProfilePage() {
   const params = useParams();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const userId = params.userId as string;
   const [user, setUser] = useState<UserProfile | null>(null);
   const [registrations, setRegistrations] = useState<UserRegistration[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
+  const [connectionStatus, setConnectionStatus] = useState<'none' | 'pending_sent' | 'pending_received' | 'connected' | 'ignored'>('none');
   const [loading, setLoading] = useState(true);
   const [connectionsLoading, setConnectionsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -56,21 +56,42 @@ export default function UserProfilePage() {
   const isOwnProfile = session?.user?.id === userId || session?.user?.email === userId;
 
   useEffect(() => {
+    if (status === 'loading') return;
+    
     if (isOwnProfile) {
-      // Redirect to the regular profile page for own profile
       window.location.href = '/profile';
       return;
     }
 
     fetchUserProfile();
     fetchConnections();
-  }, [userId, isOwnProfile]);
+    checkConnectionStatus();
+  }, [userId, isOwnProfile, status]);
+
+  const checkConnectionStatus = async () => {
+    if (!session?.user?.id) {
+      setConnectionStatus('none');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/connections/status/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setConnectionStatus(data.status || 'none');
+      } else {
+        setConnectionStatus('none');
+      }
+    } catch (err) {
+      console.error('Error checking connection status:', err);
+      setConnectionStatus('none');
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
       
-      // Fetch user profile
       const userResponse = await fetch(`/api/users/${userId}`);
       if (!userResponse.ok) {
         throw new Error('User not found');
@@ -86,7 +107,6 @@ export default function UserProfilePage() {
           setRegistrations(registrationsData);
         }
       } catch (err) {
-        // Registrations are optional, don't fail the whole page
         console.log('Could not load user registrations');
       }
 
@@ -122,13 +142,54 @@ export default function UserProfilePage() {
       });
       
       if (response.ok) {
-        setUser(prev => prev ? { ...prev, isConnected: true } : null);
-        // Refresh connections list to show the new connection
-        fetchConnections();
+        setConnectionStatus('pending_sent');
+      } else {
+        const errorData = await response.json();
+        console.error('Connect error:', errorData.error);
       }
     } catch (err) {
       console.error('Failed to connect:', err);
     }
+  };
+
+  const renderConnectionButton = () => {
+    if (connectionStatus === 'connected') {
+      return (
+        <div className="text-green-400 font-medium flex items-center">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Connected
+        </div>
+      );
+    }
+    
+    if (connectionStatus === 'pending_sent' || connectionStatus === 'ignored') {
+      return (
+        <div className="text-orange-400 font-medium flex items-center">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Request Sent
+        </div>
+      );
+    }
+    
+    if (connectionStatus === 'pending_received') {
+      return (
+        <div className="text-blue-400 font-medium flex items-center">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Wants to Connect
+        </div>
+      );
+    }
+    
+    // Default: none
+    return (
+      <button 
+        onClick={handleConnect}
+        className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors w-full md:w-auto justify-center"
+      >
+        <UserPlus className="w-4 h-4 mr-2" />
+        Connect
+      </button>
+    );
   };
 
   if (loading) {
@@ -165,12 +226,6 @@ export default function UserProfilePage() {
       
       <main className="w-full py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Back Button */}
-          <Link href="/events" className="text-blue-400 hover:text-blue-300 mb-6 inline-flex items-center transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Events
-          </Link>
-
           {/* Profile Info */}
           <div className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800">
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
@@ -215,20 +270,7 @@ export default function UserProfilePage() {
 
               {/* Connect Button */}
               <div className="flex justify-center md:justify-end">
-                {user.isConnected ? (
-                  <div className="text-green-400 font-medium flex items-center">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Connected
-                  </div>
-                ) : (
-                  <button 
-                    onClick={handleConnect}
-                    className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors w-full md:w-auto justify-center"
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Connect
-                  </button>
-                )}
+                {renderConnectionButton()}
               </div>
             </div>
           </div>

@@ -18,13 +18,18 @@ export async function GET(
       );
     }
 
-    // Get all connections for this user
+    // Get all connections for this user (only connected status)
     const connections = await dynamodb.send(new QueryCommand({
-      TableName: config.aws.connectionsTable,
-      KeyConditionExpression: 'userId = :userId',
-      ExpressionAttributeValues: {
-        ':userId': userId
-      }
+    TableName: config.aws.connectionsTable,
+    KeyConditionExpression: 'userId = :userId',
+    FilterExpression: '#status = :status',
+    ExpressionAttributeNames: {
+        '#status': 'status'
+    },
+    ExpressionAttributeValues: {
+        ':userId': userId,
+        ':status': 'connected'
+    }
     }));
 
     if (!connections.Items || connections.Items.length === 0) {

@@ -1,6 +1,7 @@
+// app/api/connections/connect/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route'; // Import your auth config
+import { authOptions } from '../../auth/[...nextauth]/route';
 import { dynamodb } from '../../../../../lib/dynamodb';
 import { PutCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { config } from '../../../../../lib/config';
@@ -8,7 +9,6 @@ import { config } from '../../../../../lib/config';
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    // console.log('Server session:', JSON.stringify(session, null, 2));
 
     if (!session?.user?.id) {
       console.error('No session user id found. Session: ', JSON.stringify(session, null, 2));
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if connection already exists
+    // Check if any connection already exists (pending or connected)
     const existingConnection = await dynamodb.send(new QueryCommand({
       TableName: config.aws.connectionsTable,
       KeyConditionExpression: 'userId = :userId AND connectedUserId = :connectedUserId',
@@ -47,21 +47,53 @@ export async function POST(request: NextRequest) {
       }
     }));
 
+    // Also check reverse direction for existing connections
+    const reverseConnection = await dynamodb.send(new QueryCommand({
+      TableName: config.aws.connectionsTable,
+      KeyConditionExpression: 'userId = :userId AND connectedUserId = :connectedUserId',
+      ExpressionAttributeValues: {
+        ':userId': userId,
+        ':connectedUserId': currentUserId
+      }
+    }));
+
     if (existingConnection.Items && existingConnection.Items.length > 0) {
-      console.error('Already connected to this user');
-      return NextResponse.json(
-        { error: 'Already connected to this user' },
-        { status: 400 }
-      );
+      const connection = existingConnection.Items[0];
+      if (connection.status === 'pending') {
+        return NextResponse.json(
+          { error: 'Connection request already sent' },
+          { status: 400 }
+        );
+      } else if (connection.status === 'connected') {
+        return NextResponse.json(
+          { error: 'Already connected to this user' },
+          { status: 400 }
+        );
+      }
     }
 
-    // Create bidirectional connection
+    if (reverseConnection.Items && reverseConnection.Items.length > 0) {
+      const connection = reverseConnection.Items[0];
+      if (connection.status === 'pending') {
+        return NextResponse.json(
+          { error: 'This user has already sent you a connection request' },
+          { status: 400 }
+        );
+      } else if (connection.status === 'connected') {
+        return NextResponse.json(
+          { error: 'Already connected to this user' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Create one-way pending connection request
     const connectionData = {
       createdAt: new Date().toISOString(),
-      status: 'connected'
+      status: 'pending'
     };
 
-    // Connection from current user to target user
+    // Connection request from current user to target user
     await dynamodb.send(new PutCommand({
       TableName: config.aws.connectionsTable,
       Item: {
@@ -71,25 +103,15 @@ export async function POST(request: NextRequest) {
       }
     }));
 
-    // Connection from target user to current user (bidirectional)
-    await dynamodb.send(new PutCommand({
-      TableName: config.aws.connectionsTable,
-      Item: {
-        userId: userId,
-        connectedUserId: currentUserId,
-        ...connectionData
-      }
-    }));
-
     return NextResponse.json({ 
       success: true, 
-      message: 'Successfully connected!' 
+      message: 'Connection request sent!' 
     });
 
   } catch (error) {
     console.error('Connection error:', error);
     return NextResponse.json(
-      { error: 'Failed to create connection' },
+      { error: 'Failed to send connection request' },
       { status: 500 }
     );
   }
