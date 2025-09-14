@@ -4,7 +4,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { User, Mail, Calendar, MapPin, LogOut, Settings, Users, UserCheck, UserX, Clock } from 'lucide-react'
+import { User, Mail, Calendar, MapPin, LogOut, Settings, Users, UserCheck, UserX, Clock, Info } from 'lucide-react'
 import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
 import AppHeader from '../../components/AppHeader';
@@ -312,26 +312,45 @@ export default function ProfilePage() {
               {/* Edit Button and Privacy Toggle */}
               <div className="flex flex-col justify-center md:justify-end space-y-3">
                 {/* Privacy Toggle */}
-                <div className="flex items-center justify-center md:justify-end space-x-3">
-                  <span className="text-sm text-gray-400">
-                    {userProfile?.profilePrivacy === 'private' ? 'Private' : 'Public'} Profile
-                  </span>
-                  <button
-                    onClick={handlePrivacyToggle}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      userProfile?.profilePrivacy === 'private' 
-                        ? 'bg-red-600' 
-                        : 'bg-green-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                <div className="flex flex-col items-center md:items-end space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-400">
+                        {userProfile?.profilePrivacy === 'private' ? 'Private' : 'Public'} Profile
+                      </span>
+                      
+                      {/* Info Icon with Tooltip */}
+                      <div className="relative group">
+                        <Info className="w-4 h-4 text-blue-400 cursor-help" />
+                        
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 w-64">
+                          <div className="text-center">
+                            Other users won&apos;t be able to view the events you are attending if your profile is &quot;private&quot;.
+                          </div>
+                          {/* Tooltip arrow */}
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={handlePrivacyToggle}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         userProfile?.profilePrivacy === 'private' 
-                          ? 'translate-x-1' 
-                          : 'translate-x-6'
+                          ? 'bg-orange-600' 
+                          : 'bg-green-600'
                       }`}
-                    />
-                  </button>
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          userProfile?.profilePrivacy === 'private' 
+                            ? 'translate-x-1' 
+                            : 'translate-x-6'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Edit Button */}

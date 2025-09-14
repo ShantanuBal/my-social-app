@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { User, Mail, Calendar, MapPin, UserPlus, Users } from 'lucide-react';
+import { User, Mail, Calendar, MapPin, UserPlus, Users, Lock } from 'lucide-react';
 import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import TeamFooter from '../../../components/TeamFooter';
@@ -252,6 +252,14 @@ export default function UserProfilePage() {
                 <h2 className="text-2xl font-bold text-white mb-2">
                   {user.name}
                 </h2>
+                
+                {/* Private Profile Notice */}
+                {user.profilePrivacy === 'private' && (
+                  <div className="flex items-center justify-center md:justify-start mb-3">
+                    <Lock className="w-4 h-4 text-orange-400 mr-2" />
+                    <span className="text-sm text-orange-400 font-medium">This profile is private</span>
+                  </div>
+                )}
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
