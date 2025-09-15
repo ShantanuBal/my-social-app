@@ -27,9 +27,9 @@ export default function ProfilePictureUpload({
     setError('');
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
-      setError('Please upload JPEG, PNG, or WebP images only.');
+      setError('Please upload JPEG, PNG, WebP or HEIC images only.');
       return;
     }
 
@@ -131,9 +131,9 @@ export default function ProfilePictureUpload({
     <div className="relative">
       {/* Current Avatar Display */}
       <div className="relative group">
-        <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+        <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
           {isUploading ? (
-            <Loader2 className="w-6 h-6 text-white animate-spin" />
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
           ) : preview ? (
             <img
               src={preview}
@@ -145,17 +145,17 @@ export default function ProfilePictureUpload({
               fileName={currentAvatar}
               alt="Profile"
               className="w-full h-full object-cover"
-              fallbackIcon={<User className="w-8 h-8 text-white" />}
+              fallbackIcon={<User className="w-12 h-12 text-white" />}
             />
           ) : (
-            <User className="w-8 h-8 text-white" />
+            <User className="w-12 h-12 text-white" />
           )}
         </div>
 
         {/* Upload Overlay */}
         {!isUploading && (
           <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-            <Camera className="w-5 h-5 text-white" />
+            <Camera className="w-6 h-6 text-white" />
           </div>
         )}
 
@@ -163,9 +163,9 @@ export default function ProfilePictureUpload({
         {!isUploading && (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors shadow-lg"
+            className="absolute -bottom-2 -right-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors shadow-lg"
           >
-            <Camera className="w-3 h-3" />
+            <Camera className="w-4 h-4" />
           </button>
         )}
       </div>
@@ -174,7 +174,7 @@ export default function ProfilePictureUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/jpg,image/png,image/webp"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,.heic"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {

@@ -7,6 +7,7 @@ import { s3 } from '../../../../../lib/s3';
 import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { config } from '../../../../../lib/config';
 import sharp from 'sharp';
+import convert from 'heic-convert';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
 const BUCKET_NAME = config.aws.profilePicturesBucket;
@@ -25,27 +26,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    // Validate file type (including HEIC)
+    const allowedTypes = [
+      'image/jpeg', 
+      'image/jpg', 
+      'image/png', 
+      'image/webp',
+      'image/heic',
+      'image/heif'
+    ];
+    
+    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.heic')) {
       return NextResponse.json(
-        { error: 'Invalid file type. Please upload JPEG, PNG, or WebP images.' },
+        { error: 'Invalid file type. Please upload JPEG, PNG, WebP, or HEIC images.' },
         { status: 400 }
       );
     }
 
-    // Validate file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (10MB limit - increased for HEIC files which can be larger)
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File too large. Please upload images smaller than 5MB.' },
+        { error: 'File too large. Please upload images smaller than 10MB.' },
         { status: 400 }
       );
     }
 
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    let buffer: Buffer = Buffer.from(arrayBuffer);
+
+    // Convert HEIC to JPEG if needed
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+      console.log('Converting HEIC to JPEG...');
+      try {
+        // Convert HEIC to JPEG using heic-convert
+        const jpegArrayBuffer = await convert({
+          buffer: Buffer.from(arrayBuffer),
+          format: 'JPEG',
+          quality: 0.9
+        });
+        
+        // Convert ArrayBuffer to Buffer
+        buffer = Buffer.from(jpegArrayBuffer);
+        console.log('HEIC conversion successful! Original size:', arrayBuffer.byteLength, 'Converted size:', buffer.length);
+      } catch (heicError) {
+        console.error('HEIC conversion failed:', heicError);
+        return NextResponse.json(
+          { error: 'Failed to process HEIC image. Please try converting to JPEG first.' },
+          { status: 400 }
+        );
+      }
+    }
 
     // Process image with Sharp - create two versions
     const [processedImage, thumbnailImage] = await Promise.all([
