@@ -203,4 +203,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+}// Force rebuild for Sharp fix
