@@ -6,7 +6,7 @@ import { dynamodb } from '../../../../../lib/dynamodb';
 import { s3 } from '../../../../../lib/s3';
 import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { config } from '../../../../../lib/config';
-import sharp from 'sharp';
+import { Jimp } from 'jimp';
 import convert from 'heic-convert';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
@@ -79,32 +79,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Process image with Sharp - create two versions
-    const [processedImage, thumbnailImage] = await Promise.all([
-      // Full size version (400x400)
-      sharp(buffer)
-        .resize(400, 400, {
-          fit: 'cover',
-          position: 'center'
-        })
-        .jpeg({
-          quality: 85,
-          progressive: true
-        })
-        .toBuffer(),
+    // Process image with jimp - create two versions with smart cropping
+    const jimpImage = await Jimp.read(buffer);
+    
+    // Create full size version (400x400) with smart crop
+    const fullSizeImage = jimpImage.clone();
+    const { width, height } = fullSizeImage.bitmap;
+    
+    // Calculate dimensions for center crop
+    const size = Math.min(width, height);
+    const x = Math.floor((width - size) / 2);
+    const y = Math.floor((height - size) / 2);
+    
+    fullSizeImage
+      .crop({x, y, w: size, h: size})  // Crop to square from center
+      .resize({w: 400, h: 400});       // Then resize to target size
+    
+    const processedImage = await fullSizeImage.getBuffer('image/jpeg');
+    
+    // Create thumbnail version (64x64) with same approach
+    const thumbImage = jimpImage.clone()
+      .crop({x, y, w: size, h: size})  // Same crop as full size
+      .resize({w: 64, h: 64});         // Resize to thumbnail
       
-      // Thumbnail version (64x64)
-      sharp(buffer)
-        .resize(64, 64, {
-          fit: 'cover',
-          position: 'center'
-        })
-        .jpeg({
-          quality: 80,
-          progressive: true
-        })
-        .toBuffer()
-    ]);
+    const thumbnailImage = await thumbImage.getBuffer('image/jpeg');
 
     // Generate unique filenames
     const timestamp = Date.now();
@@ -203,4 +201,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-}// Force rebuild for Sharp fix
+}

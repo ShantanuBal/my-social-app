@@ -31,6 +31,7 @@
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.2",
     "heic-convert": "^2.1.0",
+    "jimp": "^1.6.0",
     "lucide-react": "^0.543.0",
     "multer": "^2.0.2",
     "next": "15.5.2",
@@ -38,7 +39,6 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "resend": "^6.0.3",
-    "sharp": "^0.34.3",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
