@@ -8,12 +8,14 @@ import { User, Mail, Calendar, MapPin, LogOut, Settings, Users, UserCheck, UserX
 import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
 import AppHeader from '../../components/AppHeader';
+import ProfilePictureUpload from '../../components/ProfilePictureUpload';
 
 interface UserProfile {
   id: string;
   name: string;
   email: string;
   avatar?: string;
+  avatarThumbnail?: string; // Add this field
   location?: string;
   memberSince?: string;
   profilePrivacy?: 'public' | 'private';
@@ -228,6 +230,22 @@ export default function ProfilePage() {
     }
   }
 
+  const handleProfilePictureUpload = (imageUrl: string, thumbnailUrl?: string) => {
+    setUserProfile(prev => prev ? { 
+      ...prev, 
+      avatar: imageUrl,
+      avatarThumbnail: thumbnailUrl 
+    } : null)
+  }
+
+  const handleProfilePictureRemove = () => {
+    setUserProfile(prev => prev ? { 
+      ...prev, 
+      avatar: undefined,
+      avatarThumbnail: undefined 
+    } : null)
+  }
+
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' })
   }
@@ -270,19 +288,13 @@ export default function ProfilePage() {
           {/* Profile Info */}
           <div className="bg-gray-900 rounded-lg p-6 mb-8 border border-gray-800">
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-              {/* Avatar */}
+              {/* Avatar with Upload */}
               <div className="flex-shrink-0 mx-auto md:mx-0">
-                {userProfile?.avatar ? (
-                  <img
-                    src={userProfile.avatar}
-                    alt={userProfile.name || 'User'}
-                    className="w-20 h-20 rounded-full"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                )}
+                <ProfilePictureUpload
+                  currentAvatar={userProfile?.avatar}
+                  onUploadSuccess={handleProfilePictureUpload}
+                  onRemoveSuccess={handleProfilePictureRemove}
+                />
               </div>
 
               {/* User Info */}
@@ -362,6 +374,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Rest of the component remains the same... */}
           {/* Pending Incoming Connection Requests */}
           {pendingRequests.length > 0 && (
             <div className="bg-orange-900/20 border border-orange-600/30 rounded-lg p-6 mb-8">

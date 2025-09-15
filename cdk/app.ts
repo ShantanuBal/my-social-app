@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// cdk/app.ts
+
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { AntiSeattleFreezeStack } from './stack';

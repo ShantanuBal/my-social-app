@@ -12,7 +12,16 @@ interface SearchResult {
   name: string;
   email: string;
   avatar?: string;
+  avatarThumbnail?: string;
   isConnected?: boolean;
+}
+
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  avatarThumbnail?: string;
 }
 
 export default function AppHeader() {
@@ -24,8 +33,28 @@ export default function AppHeader() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user profile data for the logged-in user
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUserProfile();
+    }
+  }, [session?.user?.id]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`/api/users/${session?.user?.id}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setUserProfile(userData);
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -207,8 +236,18 @@ export default function AppHeader() {
                         className="block px-4 py-3 hover:bg-gray-700 border-b border-gray-700 last:border-b-0"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                            <User className="w-4 h-4 text-white" />
+                          <div className="w-8 h-8 rounded-full overflow-hidden">
+                            {user.avatarThumbnail ? (
+                              <img
+                                src={user.avatarThumbnail}
+                                alt={user.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-blue-500 rounded-full flex items-center justify-center">
+                                <User className="w-4 h-4 text-white" />
+                              </div>
+                            )}
                           </div>
                           <div>
                             <p className="text-white font-medium">{user.name}</p>
@@ -235,10 +274,20 @@ export default function AppHeader() {
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="w-8 h-8 bg-green-600 hover:bg-green-700 rounded-full flex items-center justify-center text-white transition-colors"
+                  className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent hover:border-gray-600 transition-colors"
                   title={`Logged in as ${session.user?.email}`}
                 >
-                  <User className="w-4 h-4" />
+                  {userProfile?.avatarThumbnail ? (
+                    <img
+                      src={userProfile.avatarThumbnail}
+                      alt={userProfile.name || 'Profile'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-green-600 hover:bg-green-700 flex items-center justify-center text-white transition-colors">
+                      <User className="w-4 h-4" />
+                    </div>
+                  )}
                 </button>
                 
                 {showProfileDropdown && (

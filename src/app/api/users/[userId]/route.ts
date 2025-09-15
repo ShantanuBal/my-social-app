@@ -52,8 +52,7 @@ export async function GET(
       }
     }
 
-    console.log("Created at: ", result.Item.createdAt)
-    console.log("profilePrivacy: ", result.Item.profilePrivacy)
+    console.log("User profile data: ", result.Item)
 
     // Return public profile information
     const userProfile = {
