@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "buildCommand": "npm install && npm install sharp --platform=linux --arch=x64 && npm run build"
+}
