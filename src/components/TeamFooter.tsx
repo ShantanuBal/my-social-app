@@ -25,7 +25,7 @@ export default function TeamFooter() {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-gray-500 text-xs">
-              © 2025 Seattle Anti-Freeze LLC. All rights reserved. Unauthorized freezing prohibited.
+              © 2025 Seattle Anti-Freeze team. All rights reserved. Unauthorized freezing prohibited.
             </p>
           </div>
 
