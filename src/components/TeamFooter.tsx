@@ -8,17 +8,26 @@ export default function TeamFooter() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col items-center space-y-4">
           
+          {/* Links Section */}
+          <div className="flex flex-wrap justify-center gap-6 text-sm">
+            <Link 
+              href="/contact"
+              className="text-blue-400 hover:text-blue-300 transition-colors underline"
+            >
+              Contact
+            </Link>
+            <Link 
+              href="/privacy"
+              className="text-blue-400 hover:text-blue-300 transition-colors underline"
+            >
+              Privacy Policy
+            </Link>
+          </div>
+
           {/* Contact Section */}
           <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">
-              Questions or feedback? Visit our{' '}
-              <Link 
-                href="/contact"
-                className="text-blue-400 hover:text-blue-300 transition-colors underline"
-              >
-                contact page
-              </Link>
-              .
+            <p className="text-gray-400 text-sm">
+              Questions or feedback? We&apos;d love to hear from you.
             </p>
           </div>
 
