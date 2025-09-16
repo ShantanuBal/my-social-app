@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Users, Clock } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, DollarSign } from 'lucide-react';
 import TeamFooter from '../../components/TeamFooter';
 import RegistrationModal from '../../components/RegistrationModal';
+import PaymentCheckout from '../../components/PaymentCheckout';
 import AppHeader from '../../components/AppHeader';
 
 interface Event {
@@ -17,6 +18,11 @@ interface Event {
   maxAttendees: number;
   category: string;
   image: string;
+  
+  // pricing fields
+  price: number; // in cents (e.g., 2500 = $25.00, 0 = free)
+  currency: string; // "usd"
+  isPaid: boolean; // true if price > 0, false for free events
 }
 
 export default function EventsPage() {
@@ -25,6 +31,7 @@ export default function EventsPage() {
   const [error, setError] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const fetchEvents = async () => {
@@ -43,12 +50,22 @@ export default function EventsPage() {
 
   const handleJoinEvent = (event: Event) => {
     setSelectedEvent(event);
-    setIsModalOpen(true);
+    
+    if (event.isPaid && event.price > 0) {
+      setIsPaymentModalOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
   };
 
   const handleRegistrationSuccess = () => {
     // Refresh events to show updated attendee count
     fetchEvents();
+  };
+
+  const formatPrice = (priceInCents: number) => {
+    if (priceInCents === 0) return 'Free';
+    return `$${(priceInCents / 100).toFixed(2)}`;
   };
 
   useEffect(() => {
@@ -125,10 +142,13 @@ export default function EventsPage() {
 
                     {/* Event Content */}
                     <div className="p-6 flex flex-col flex-1">
-                    {/* Category Badge */}
-                    <div className="mb-4">
+                    {/* Category Badge and Price */}
+                    <div className="mb-4 flex items-center justify-between">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold text-white ${getCategoryColor(event.category)}`}>
                         {event.category}
+                        </span>
+                        <span className={`text-sm font-bold ${event.isPaid ? 'text-green-400' : 'text-blue-400'}`}>
+                        {formatPrice(event.price)}
                         </span>
                     </div>
 
@@ -160,11 +180,17 @@ export default function EventsPage() {
                         <Users className="w-4 h-4 mr-3" />
                         <span>{event.attendees}/{event.maxAttendees} attending</span>
                         </div>
+                        <div className="flex items-center text-sm font-semibold">
+                        <DollarSign className="w-4 h-4 mr-3 text-green-400" />
+                        <span className={event.isPaid ? 'text-green-400' : 'text-blue-400'}>
+                            {formatPrice(event.price)}
+                        </span>
+                        </div>
                     </div>
 
                     {/* Join Button */}
                     <button onClick={() => handleJoinEvent(event)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
-                        Join Event
+                        {event.isPaid ? `Register - ${formatPrice(event.price)}` : 'Join Event - Free'}
                     </button>
                     </div>
                 </div>
@@ -173,13 +199,25 @@ export default function EventsPage() {
             </div>
         </main>
 
-        {/* Registration Modal */}
-        {selectedEvent && (
+        {/* Free Event Registration Modal */}
+        {selectedEvent && !selectedEvent.isPaid && (
             <RegistrationModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 eventId={selectedEvent.id}
                 eventTitle={selectedEvent.title}
+                onSuccess={handleRegistrationSuccess}
+            />
+        )}
+
+        {/* Paid Event Payment Checkout */}
+        {selectedEvent && selectedEvent.isPaid && (
+            <PaymentCheckout
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                eventId={selectedEvent.id}
+                eventTitle={selectedEvent.title}
+                eventPrice={selectedEvent.price}
                 onSuccess={handleRegistrationSuccess}
             />
         )}
