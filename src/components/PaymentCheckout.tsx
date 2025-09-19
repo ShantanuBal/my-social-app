@@ -17,6 +17,7 @@ interface PaymentCheckoutProps {
   eventTitle: string;
   eventPrice: number; // in cents
   onSuccess: () => void;
+  onOptimisticSuccess: (eventId: string) => void;
 }
 
 interface CheckoutFormProps {
@@ -25,6 +26,7 @@ interface CheckoutFormProps {
   eventPrice: number;
   onSuccess: () => void;
   onClose: () => void;
+  onOptimisticSuccess: (eventId: string) => void;
 }
 
 // Card styling
@@ -44,7 +46,7 @@ const cardElementOptions = {
   },
 };
 
-function CheckoutForm({ eventId, eventTitle, eventPrice, onSuccess, onClose }: CheckoutFormProps) {
+function CheckoutForm({ eventId, eventTitle, eventPrice, onSuccess, onClose, onOptimisticSuccess }: CheckoutFormProps) {
   const { data: session } = useSession();
   const stripe = useStripe();
   const elements = useElements();
@@ -114,8 +116,13 @@ function CheckoutForm({ eventId, eventTitle, eventPrice, onSuccess, onClose }: C
       setError(result.error.message || 'Payment failed');
       setIsLoading(false);
     } else {
-      // Payment succeeded
+      // Payment succeeded - immediately update UI optimistically
+      onOptimisticSuccess(eventId);
+      
+      // Show success state
       setIsSuccess(true);
+      
+      // Also call regular success callback for any other cleanup
       onSuccess();
     }
   };
@@ -197,7 +204,7 @@ function CheckoutForm({ eventId, eventTitle, eventPrice, onSuccess, onClose }: C
   );
 }
 
-export default function PaymentCheckout({ isOpen, onClose, eventId, eventTitle, eventPrice, onSuccess }: PaymentCheckoutProps) {
+export default function PaymentCheckout({ isOpen, onClose, eventId, eventTitle, eventPrice, onSuccess, onOptimisticSuccess }: PaymentCheckoutProps) {
   if (!isOpen) return null;
 
   return (
@@ -220,6 +227,7 @@ export default function PaymentCheckout({ isOpen, onClose, eventId, eventTitle, 
             eventPrice={eventPrice}
             onSuccess={onSuccess}
             onClose={onClose}
+            onOptimisticSuccess={onOptimisticSuccess}
           />
         </Elements>
       </div>

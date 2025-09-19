@@ -95,6 +95,16 @@ export default function EventsPage() {
     checkRegistrationStatus();
   };
 
+  const handleOptimisticRegistration = (eventId: string) => {
+    // Immediately update registration status for optimistic UI
+    setRegistrationStatus(prev => ({
+      ...prev,
+      [eventId]: true
+    }));
+    // Also refresh events to show updated attendee count
+    fetchEvents();
+  };
+
   const formatPrice = (priceInCents: number) => {
     if (priceInCents === 0) return 'Free';
     return `$${(priceInCents / 100).toFixed(2)}`;
@@ -289,6 +299,7 @@ export default function EventsPage() {
                 eventTitle={selectedEvent.title}
                 eventPrice={selectedEvent.price}
                 onSuccess={handleRegistrationSuccess}
+                onOptimisticSuccess={handleOptimisticRegistration}
             />
         )}
 
