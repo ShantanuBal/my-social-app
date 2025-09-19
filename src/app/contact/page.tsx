@@ -34,8 +34,8 @@ export default function ContactPage() {
                 <StaticImage 
                   fileName="team/team-photo.jpg" // Organized in team folder
                   alt="Seattle Anti-Freeze Team"
-                  className="w-64 h-48 rounded-lg object-cover shadow-lg"
-                  fallbackClassName="w-64 h-48 rounded-lg bg-gray-700 flex items-center justify-center"
+                  className="w-80 h-60 rounded-lg object-cover shadow-lg"
+                  fallbackClassName="w-80 h-60 rounded-lg bg-gray-700 flex items-center justify-center"
                 />
                 
                 <div className="text-center max-w-2xl">
