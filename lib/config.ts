@@ -5,7 +5,7 @@ export const getTableName = (tableType: 'events' | 'registrations' | 'users' | '
   return `${tableType}-${environment}`;
 };
 
-export const getBucketName = (bucketType: 'profile-pictures') => {
+export const getBucketName = (bucketType: 'profile-pictures' | 'static-files') => {
   const environment = process.env.NODE_ENV === 'production' ? 'production' : 'local';
   return `seattle-anti-freeze-${bucketType}-${environment}`;
 };
@@ -18,5 +18,6 @@ export const config = {
     usersTable: getTableName('users'),
     connectionsTable: getTableName('connections'),
     profilePicturesBucket: getBucketName('profile-pictures'),
+    staticFilesBucket: getBucketName('static-files'),
   }
 };

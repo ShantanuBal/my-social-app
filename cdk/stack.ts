@@ -50,6 +50,34 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
       autoDeleteObjects: environment === 'local', // Only auto-delete in local environment
     });
 
+    // S3 Bucket for website static files (team images, logos, banners, etc.)
+    const staticFilesBucket = new s3.Bucket(this, `StaticFilesBucket-${environment}`, {
+      bucketName: `seattle-anti-freeze-static-files-${environment}`,
+      publicReadAccess: false, // Keep private, serve via signed URLs
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      cors: [
+        {
+          allowedMethods: [
+            s3.HttpMethods.GET,
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.POST,
+          ],
+          allowedOrigins: ['*'], // In production, you might want to restrict this to your domain
+          allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
+        },
+      ],
+      lifecycleRules: [
+        {
+          id: 'DeleteIncompleteMultipartUploads',
+          abortIncompleteMultipartUploadAfter: cdk.Duration.days(1),
+        },
+      ],
+      versioned: false,
+      removalPolicy: environment === 'local' ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      autoDeleteObjects: environment === 'local',
+    });
+
     // Events table
     const eventsTable = new dynamodb.Table(this, `EventsTable-${environment}`, {
       tableName: `events-${environment}`,
@@ -146,6 +174,16 @@ export class AntiSeattleFreezeStack extends cdk.Stack {
     new cdk.CfnOutput(this, `ProfilePicturesBucketUrl-${environment}`, {
       value: `https://${profilePicturesBucket.bucketName}.s3.${this.region}.amazonaws.com`,
       description: 'S3 bucket URL for profile pictures',
+    });
+
+    new cdk.CfnOutput(this, `StaticFilesBucketName-${environment}`, {
+      value: staticFilesBucket.bucketName,
+      description: 'S3 bucket for website static files',
+    });
+
+    new cdk.CfnOutput(this, `StaticFilesBucketUrl-${environment}`, {
+      value: `https://${staticFilesBucket.bucketName}.s3.${this.region}.amazonaws.com`,
+      description: 'S3 bucket URL for website static files',
     });
 
     new cdk.CfnOutput(this, `EventsTableName-${environment}`, {

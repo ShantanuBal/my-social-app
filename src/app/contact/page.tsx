@@ -5,6 +5,7 @@ import { Mail, Instagram, MapPin, Users, Heart, Target } from 'lucide-react';
 import Link from 'next/link';
 import AppHeader from '../../components/AppHeader';
 import TeamFooter from '../../components/TeamFooter';
+import StaticImage from '../../components/StaticImage';
 
 export default function ContactPage() {
   return (
@@ -21,6 +22,31 @@ export default function ContactPage() {
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
               Have questions, feedback, or want to get involved? We&apos;d love to hear from you!
             </p>
+          </div>
+
+          {/* Team Section */}
+          <div className="text-center mb-12">
+            <div className="bg-gray-900 rounded-lg p-8 border border-gray-800">
+              <h2 className="text-2xl font-bold text-white mb-6">Meet Our Team</h2>
+              
+              <div className="flex flex-col items-center space-y-4">
+                {/* Team Photo */}
+                <StaticImage 
+                  fileName="team/team-photo.jpg" // Organized in team folder
+                  alt="Seattle Anti-Freeze Team"
+                  className="w-64 h-48 rounded-lg object-cover shadow-lg"
+                  fallbackClassName="w-64 h-48 rounded-lg bg-gray-700 flex items-center justify-center"
+                />
+                
+                <div className="text-center max-w-2xl">
+                  <p className="text-gray-300 leading-relaxed">
+                    We&apos;re Shan, Jen and Greg, three kindred spirits from Seattle who believe in the power of human 
+                    connection IRL. Having experienced the &quot;Seattle Freeze&quot; ourselves, we&apos;re dedicated to creating 
+                    spaces where people come together in real file and form genuine friendships and social circles.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Mission & Vision Section */}
@@ -221,5 +247,4 @@ export default function ContactPage() {
 
       <TeamFooter />
     </div>
-  );
-}
+  )};
