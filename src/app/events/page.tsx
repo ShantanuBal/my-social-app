@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Users, Clock, DollarSign } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { Calendar, MapPin, Users, Clock, DollarSign, CheckCircle } from 'lucide-react';
 import TeamFooter from '../../components/TeamFooter';
 import RegistrationModal from '../../components/RegistrationModal';
 import PaymentCheckout from '../../components/PaymentCheckout';
@@ -25,8 +26,14 @@ interface Event {
   isPaid: boolean; // true if price > 0, false for free events
 }
 
+interface RegistrationStatus {
+  [eventId: string]: boolean;
+}
+
 export default function EventsPage() {
+  const { data: session, status } = useSession();
   const [events, setEvents] = useState<Event[]>([]);
+  const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -35,18 +42,41 @@ export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const fetchEvents = async () => {
-      try {
-        const response = await fetch('/api/events');
-        if (!response.ok) throw new Error('Failed to fetch events');
-        const data = await response.json();
-        setEvents(data);
-      } catch (err) {
-        setError('Failed to load events');
-        console.error('Error fetching events:', err);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const response = await fetch('/api/events');
+      if (!response.ok) throw new Error('Failed to fetch events');
+      const data = await response.json();
+      setEvents(data);
+    } catch (err) {
+      setError('Failed to load events');
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const checkRegistrationStatus = async () => {
+    if (!session?.user?.id) {
+      setRegistrationStatus({});
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/users/${session.user.id}/registrations`);
+      if (response.ok) {
+        const registrations = await response.json();
+        const statusMap: RegistrationStatus = {};
+        
+        registrations.forEach((registration: { eventId: string }) => {
+          statusMap[registration.eventId] = true;
+        });
+        
+        setRegistrationStatus(statusMap);
+      }
+    } catch (err) {
+      console.error('Error checking registration status:', err);
+    }
+  };
 
   const handleJoinEvent = (event: Event) => {
     setSelectedEvent(event);
@@ -61,6 +91,8 @@ export default function EventsPage() {
   const handleRegistrationSuccess = () => {
     // Refresh events to show updated attendee count
     fetchEvents();
+    // Refresh registration status
+    checkRegistrationStatus();
   };
 
   const formatPrice = (priceInCents: number) => {
@@ -71,6 +103,12 @@ export default function EventsPage() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      checkRegistrationStatus();
+    }
+  }, [session]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -93,6 +131,40 @@ export default function EventsPage() {
     return colors[category] || 'bg-gray-500';
   };
 
+  const isRegisteredForEvent = (eventId: string) => {
+    return registrationStatus[eventId] || false;
+  };
+
+  const renderEventButton = (event: Event) => {
+    const isRegistered = isRegisteredForEvent(event.id);
+    const isAtCapacity = event.attendees >= event.maxAttendees;
+
+    if (isRegistered) {
+      return (
+        <div className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
+          <CheckCircle className="w-5 h-5 mr-2" />
+          You are registered for this event
+        </div>
+      );
+    }
+
+    if (isAtCapacity) {
+      return (
+        <div className="w-full bg-gray-600 text-gray-300 py-3 px-4 rounded-lg font-semibold text-center cursor-not-allowed">
+          Event at Capacity
+        </div>
+      );
+    }
+
+    return (
+      <button 
+        onClick={() => handleJoinEvent(event)} 
+        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto"
+      >
+        {event.isPaid ? `Register - ${formatPrice(event.price)}` : 'Join Event - Free'}
+      </button>
+    );
+  };
 
   if (loading) {
     return (
@@ -188,10 +260,8 @@ export default function EventsPage() {
                         </div>
                     </div>
 
-                    {/* Join Button */}
-                    <button onClick={() => handleJoinEvent(event)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto">
-                        {event.isPaid ? `Register - ${formatPrice(event.price)}` : 'Join Event - Free'}
-                    </button>
+                    {/* Registration Button or Status */}
+                    {renderEventButton(event)}
                     </div>
                 </div>
                 ))}

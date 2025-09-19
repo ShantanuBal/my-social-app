@@ -40,6 +40,7 @@ export default function RegistrationModal({
     if (session?.user?.email) {
       setFormData(prev => ({
         ...prev,
+        userId: session.user.id || '',
         email: session.user.email || '',
         name: session.user.name || ''
       }));
@@ -68,8 +69,18 @@ export default function RegistrationModal({
         }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error('Registration failed');
+        // Handle specific error cases
+        if (responseData.alreadyRegistered) {
+          setError(responseData.error || 'You are already registered for this event.');
+        } else if (responseData.atCapacity) {
+          setError(responseData.error || 'This event is at capacity.');
+        } else {
+          setError(responseData.error || 'Registration failed. Please try again.');
+        }
+        return;
       }
 
       setIsSuccess(true);
@@ -95,8 +106,18 @@ export default function RegistrationModal({
         body: JSON.stringify(formData),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error('Registration failed');
+        // Handle specific error cases
+        if (responseData.alreadyRegistered) {
+          setError(responseData.error || 'This email is already registered for this event.');
+        } else if (responseData.atCapacity) {
+          setError(responseData.error || 'This event is at capacity.');
+        } else {
+          setError(responseData.error || 'Registration failed. Please try again.');
+        }
+        return;
       }
 
       setIsSuccess(true);
@@ -279,7 +300,9 @@ export default function RegistrationModal({
 
               {/* Error Message */}
               {error && (
-                <div className="text-red-400 text-sm">{error}</div>
+                <div className="bg-red-900/50 border border-red-500 rounded-lg p-3">
+                  <p className="text-red-300 text-sm">{error}</p>
+                </div>
               )}
 
               {/* Submit Button */}
@@ -502,7 +525,9 @@ export default function RegistrationModal({
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-400 text-sm mt-4 text-center">{error}</div>
+          <div className="bg-red-900/50 border border-red-500 rounded-lg p-3 mt-4">
+            <p className="text-red-300 text-sm text-center">{error}</p>
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,7 @@
 // app/api/events/[eventId]/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { dynamodb } from '../../../../../../lib/dynamodb';
-import { PutCommand, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, UpdateCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { config } from '../../../../../../lib/config';
 import { Resend } from 'resend';
 
@@ -21,6 +21,45 @@ export async function POST(
     const finalUserId = userId || `${email.replace('@', '_at_')}_${Date.now()}`;
     const userType = isRegisteredUser ? 'registered' : 'guest';
 
+    // Check if user is already registered for this event
+    // First check by userId if they're a registered user
+    if (isRegisteredUser) {
+      const existingUserRegistration = await dynamodb.send(new GetCommand({
+        TableName: config.aws.registrationsTable,
+        Key: { 
+          eventId: eventId,
+          userId: userId 
+        }
+      }));
+
+      if (existingUserRegistration.Item) {
+        return NextResponse.json({
+          error: 'You are already registered for this event.',
+          alreadyRegistered: true
+        }, { status: 409 }); // 409 Conflict
+      }
+    }
+
+    // Check by email using the email-index GSI to catch duplicate emails
+    // (in case they're trying to register with same email but different account)
+    const existingEmailRegistration = await dynamodb.send(new QueryCommand({
+      TableName: config.aws.registrationsTable,
+      IndexName: 'email-index',
+      KeyConditionExpression: 'email = :email',
+      FilterExpression: 'eventId = :eventId',
+      ExpressionAttributeValues: {
+        ':email': email,
+        ':eventId': eventId
+      }
+    }));
+
+    if (existingEmailRegistration.Items && existingEmailRegistration.Items.length > 0) {
+      return NextResponse.json({
+        error: 'This email address is already registered for this event.',
+        alreadyRegistered: true
+      }, { status: 409 }); // 409 Conflict
+    }
+
     // Get event details for the email
     const eventResponse = await dynamodb.send(new GetCommand({
       TableName: config.aws.eventsTable,
@@ -33,6 +72,14 @@ export async function POST(
         { error: 'Event not found' }, 
         { status: 404 }
       );
+    }
+
+    // Check if event is at capacity
+    if (event.attendees >= event.maxAttendees) {
+      return NextResponse.json({
+        error: 'This event is at capacity. Registration is no longer available.',
+        atCapacity: true
+      }, { status: 409 });
     }
 
     // 1. Save registration
