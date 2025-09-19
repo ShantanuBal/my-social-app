@@ -9,13 +9,14 @@ import Link from 'next/link'
 import TeamFooter from '../../components/TeamFooter';
 import AppHeader from '../../components/AppHeader';
 import ProfilePictureUpload from '../../components/ProfilePictureUpload';
+import SecureImage from '../../components/SecureImage';
 
 interface UserProfile {
   id: string;
   name: string;
   email: string;
   avatar?: string;
-  avatarThumbnail?: string; // Add this field
+  avatarThumbnail?: string;
   location?: string;
   memberSince?: string;
   profilePrivacy?: 'public' | 'private';
@@ -36,6 +37,7 @@ interface ConnectionUser {
   location?: string;
   bio?: string;
   memberSince: string;
+  avatarThumbnail?: string;
 }
 
 interface Connection {
@@ -83,7 +85,6 @@ export default function ProfilePage() {
       return
     }
 
-    // Only fetch data once when component mounts and session is ready
     fetchUserProfile()
     fetchUserRegistrations()
     fetchConnections()
@@ -111,7 +112,8 @@ export default function ProfilePage() {
 
   const fetchUserRegistrations = async () => {
     try {
-      const response = await fetch('/api/user/registrations')
+      const response = await fetch
+      ('/api/user/registrations')
       if (response.ok) {
         const data = await response.json()
         setRegistrations(data)
@@ -374,7 +376,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Rest of the component remains the same... */}
           {/* Pending Incoming Connection Requests */}
           {pendingRequests.length > 0 && (
             <div className="bg-orange-900/20 border border-orange-600/30 rounded-lg p-6 mb-8">
@@ -640,11 +641,16 @@ export default function ProfilePage() {
                       className="block hover:bg-gray-800 rounded-lg p-3 transition-colors"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white font-medium text-sm">
-                            {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
-                          </span>
-                        </div>
+                        <SecureImage
+                          fileName={connection.user.avatarThumbnail}
+                          alt={`${connection.user.name}'s profile picture`}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-600 flex-shrink-0"
+                          fallbackIcon={
+                            <span className="text-white font-medium text-sm">
+                              {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
+                            </span>
+                          }
+                        />
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">

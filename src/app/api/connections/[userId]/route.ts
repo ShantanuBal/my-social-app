@@ -70,7 +70,8 @@ export async function GET(
         email: userDetails[index].email,
         location: userDetails[index].location,
         bio: userDetails[index].bio,
-        memberSince: userDetails[index].memberSince
+        memberSince: userDetails[index].memberSince,
+        avatarThumbnail: userDetails[index].avatarThumbnail
       } : null
     })).filter(conn => conn.user !== null); // Filter out any failed lookups
 
@@ -78,6 +79,8 @@ export async function GET(
     connectionsWithDetails.sort((a, b) => 
       new Date(b.connectedAt).getTime() - new Date(a.connectedAt).getTime()
     );
+
+    console.log("User connections: ", connectionsWithDetails)
 
     return NextResponse.json({ 
       connections: connectionsWithDetails,
