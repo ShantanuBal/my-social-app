@@ -18,12 +18,27 @@ const events = [
     time: "7 PM",
     location: "Ascend Bellevue – the perfect backdrop with both indoor + outdoor vibe",
     attendees: 0,
-    maxAttendees: 6,
+    maxAttendees: 1,
     category: "Social",
     image: "👨‍🍳",
-    price: 2000, // $20.00 (venue cost)
+    price: 100, // $1.00 (venue cost)
     currency: "usd",
     isPaid: true
+  },
+  {
+    id: '2',
+    title: "Coffee & Connections: Seattle Freelancers Meetup",
+    description: "Join fellow freelancers, remote workers, and entrepreneurs for a casual coffee meetup in the heart of Seattle! Whether you're a designer, developer, writer, consultant, or any other type of independent professional, this is your chance to connect with like-minded people.\n\n☕ What to expect:\n• Relaxed networking in a cozy coffee shop setting\n• Share experiences, challenges, and wins\n• Potential collaboration opportunities\n• Tips and resources for freelance success\n• Maybe find your next coffee buddy or accountability partner\n\nNo pressure, no sales pitches - just genuine connections over great coffee. Bring your laptop if you want to work together after, or just come to chat!\n\nPerfect for: Freelancers, remote workers, digital nomads, entrepreneurs, and anyone interested in the independent work lifestyle.",
+    date: "2025-09-28",
+    time: "10:30 AM",
+    location: "Victrola Coffee Roasters, Capitol Hill",
+    attendees: 0,
+    maxAttendees: 1,
+    category: "Networking",
+    image: "☕",
+    price: 0, // Free event
+    currency: "usd",
+    isPaid: false
   }
 ];
 

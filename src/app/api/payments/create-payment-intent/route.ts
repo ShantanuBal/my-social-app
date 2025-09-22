@@ -10,15 +10,17 @@ import { authOptions } from '../../auth/[...nextauth]/route';
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const { eventId } = await request.json();
+    const { eventId, guestEmail, guestName } = await request.json();
 
     if (!eventId) {
       return NextResponse.json({ error: 'Event ID is required' }, { status: 400 });
+    }
+
+    // For guest users, we need email and name
+    if (!session?.user?.id && (!guestEmail || !guestName)) {
+      return NextResponse.json({ 
+        error: 'Guest email and name are required for guest checkout' 
+      }, { status: 400 });
     }
 
     // Get event details from database
@@ -42,15 +44,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Event is full' }, { status: 400 });
     }
 
+    // Determine user info for payment intent metadata
+    let userId: string;
+    let userEmail: string;
+    let userName: string;
+
+    if (session?.user?.id) {
+      // Logged in user
+      userId = session.user.id;
+      userEmail = session.user.email || '';
+      userName = session.user.name || '';
+    } else {
+      // Guest user - create a unique guest ID
+      userId = `guest_${guestEmail.replace('@', '_at_')}`;
+      userEmail = guestEmail;
+      userName = guestName;
+    }
+
     // Create Stripe Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: event.price, // Price in cents
       currency: event.currency || 'usd',
       metadata: {
         eventId: eventId,
-        userId: session.user.id,
+        userId: userId,
         eventTitle: event.title,
-        userEmail: session.user.email || '',
+        userEmail: userEmail,
+        userName: userName,
+        userType: session?.user?.id ? 'registered' : 'guest',
       },
     });
 
