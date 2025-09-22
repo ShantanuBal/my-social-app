@@ -12,91 +12,16 @@ const dynamodb = DynamoDBDocumentClient.from(client);
 const events = [
   {
     id: '1',
-    title: "Coffee & Connections at Pike Place",
-    description: "Join fellow coffee enthusiasts for morning conversations and networking in the heart of Seattle.",
-    date: "2025-09-15",
-    time: "9:00 AM",
-    location: "Pike Place Market, Seattle",
-    attendees: 0,
-    maxAttendees: 20,
-    category: "Networking",
-    image: "☕",
-    price: 0, // Free event
-    currency: "usd",
-    isPaid: false
-  },
-  {
-    id: '2',
-    title: "Capitol Hill Art Walk & Meet",
-    description: "Explore local galleries and street art while meeting creative minds in Capitol Hill.",
-    date: "2025-09-18",
-    time: "6:00 PM",
-    location: "Capitol Hill, Seattle",
-    attendees: 0,
-    maxAttendees: 15,
-    category: "Arts & Culture",
-    image: "🎨",
-    price: 1500, // $15.00
-    currency: "usd",
-    isPaid: true
-  },
-  {
-    id: '3',
-    title: "Hiking Group: Rattlesnake Ledge",
-    description: "Experience breathtaking views and meet outdoor enthusiasts on this popular hiking trail.",
-    date: "2025-09-20",
-    time: "8:00 AM",
-    location: "Rattlesnake Ledge Trailhead",
-    attendees: 0,
-    maxAttendees: 12,
-    category: "Outdoor",
-    image: "🥾",
-    price: 2500, // $25.00 (includes transportation)
-    currency: "usd",
-    isPaid: true
-  },
-  {
-    id: '4',
-    title: "Board Game Night at Fremont",
-    description: "Unwind with classic and modern board games in a cozy neighborhood setting.",
-    date: "2025-09-22",
-    time: "7:00 PM",
-    location: "Fremont Community Center",
-    attendees: 0,
-    maxAttendees: 25,
-    category: "Social",
-    image: "🎲",
-    price: 500, // $5.00 (venue cost)
-    currency: "usd",
-    isPaid: true
-  },
-  {
-    id: '5',
-    title: "Volunteer Beach Cleanup",
-    description: "Make a positive impact while meeting community-minded individuals at Alki Beach.",
+    title: "Sogaeting, Korean dating vibes straight to Seattle",
+    description: "We’re bringing Korean dating vibes straight to Seattle with a sogaeting-style night out you won’t forget! Think fun, low-pressure matchmaking meets a cozy hangout where sparks and friendships fly. \n💌 We’ll help you mix, mingle, and connect with new people in a K-style “sogaeting” twist ✨ Chill group activities to break the ice (no awkwardness allowed) \n🤝 A night where strangers become friends, and maybe even something more If you’ve been looking for a fresh way to meet people IRL — this is it. Bring your curiosity, leave with connections. \n🎟️ Tickets are limited — grab yours now and don’t miss out!",
     date: "2025-09-25",
-    time: "10:00 AM",
-    location: "Alki Beach, West Seattle",
+    time: "7 PM",
+    location: "Ascend Bellevue – the perfect backdrop with both indoor + outdoor vibe",
     attendees: 0,
-    maxAttendees: 40,
-    category: "Community",
-    image: "🏖️",
-    price: 0, // Free community service
-    currency: "usd",
-    isPaid: false
-  },
-  {
-    id: '6',
-    title: "Cooking Class: Pacific Northwest Cuisine",
-    description: "Learn to prepare local dishes with fresh ingredients while socializing with food lovers.",
-    date: "2025-09-28",
-    time: "6:30 PM",
-    location: "Seattle Culinary Academy",
-    attendees: 0,
-    maxAttendees: 16,
+    maxAttendees: 6,
     category: "Social",
     image: "👨‍🍳",
-    price: 4500, // $45.00 (includes ingredients)
+    price: 2000, // $20.00 (venue cost)
     currency: "usd",
     isPaid: true
   }
