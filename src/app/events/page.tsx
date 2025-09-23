@@ -7,6 +7,7 @@ import TeamFooter from '../../components/TeamFooter';
 import RegistrationModal from '../../components/RegistrationModal';
 import PaymentCheckout from '../../components/PaymentCheckout';
 import AppHeader from '../../components/AppHeader';
+import StaticImage from '../../components/StaticImage';
 
 interface Event {
   id: string;
@@ -218,8 +219,23 @@ export default function EventsPage() {
                     className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors duration-300 border border-gray-800 hover:border-gray-600 flex flex-col h-full"
                 >
                     {/* Event Image/Icon */}
-                    <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                    <span className="text-6xl">{event.image}</span>
+                    <div className="h-48 overflow-hidden">
+                      {/* Check if image is an emoji or S3 path */}
+                      {event.image.length <= 4 || /^[\u{1F600}-\u{1F64F}]|^[\u{1F300}-\u{1F5FF}]|^[\u{1F680}-\u{1F6FF}]|^[\u{1F1E0}-\u{1F1FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(event.image) ? (
+                        // Show emoji
+                        <div className="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <span className="text-6xl">{event.image}</span>
+                        </div>
+                      ) : (
+                        // Show S3 image using StaticImage component
+                        <StaticImage
+                          fileName={event.image}
+                          alt={event.title}
+                          className="w-full h-48 object-cover"
+                          fallbackClassName="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                          fallbackIcon={<span className="text-4xl text-white">🎉</span>}
+                        />
+                      )}
                     </div>
 
                     {/* Event Content */}
