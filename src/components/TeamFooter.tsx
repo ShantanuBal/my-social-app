@@ -22,6 +22,12 @@ export default function TeamFooter() {
             >
               Privacy Policy
             </Link>
+            <Link 
+              href="/terms"
+              className="text-blue-400 hover:text-blue-300 transition-colors underline"
+            >
+              Terms of Service
+            </Link>
           </div>
 
           {/* Contact Section */}
