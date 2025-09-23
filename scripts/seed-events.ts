@@ -13,9 +13,9 @@ const events = [
   {
     id: '1',
     title: "Sogaeting, Korean dating vibes straight to Seattle",
-    description: "We’re bringing Korean dating vibes straight to Seattle with a sogaeting-style night out you won’t forget! Think fun, low-pressure matchmaking meets a cozy hangout where sparks and friendships fly. \n💌 We’ll help you mix, mingle, and connect with new people in a K-style “sogaeting” twist ✨ Chill group activities to break the ice (no awkwardness allowed) \n🤝 A night where strangers become friends, and maybe even something more If you’ve been looking for a fresh way to meet people IRL — this is it. Bring your curiosity, leave with connections. \n🎟️ Tickets are limited — grab yours now and don’t miss out!",
+    description: "We’re bringing Korean dating vibes straight to Seattle with a sogaeting-style night out you won’t forget! Think fun, low-pressure matchmaking meets a cozy hangout where sparks and friendships fly. \n💌 We’ll help you mix, mingle, and connect with new people in a K-style “sogaeting” twist ✨ Chill group activities to break the ice (no awkwardness allowed) \n🤝 A night where strangers become friends, and maybe even something more If you’ve been looking for a fresh way to meet people IRL — this is it. Bring your curiosity, leave with connections. \n🎟️ Tickets are limited — grab yours now and don’t miss out! (Note: This ticket does not include food/drinks ordered at the restaurant)",
     date: "2025-09-25",
-    time: "7 PM",
+    time: "7:30 PM",
     location: "Ascend Bellevue – the perfect backdrop with both indoor + outdoor vibe",
     attendees: 0,
     maxAttendees: 6,

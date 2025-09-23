@@ -8,12 +8,14 @@ import { User, Mail, Calendar, MapPin, UserPlus, Users, Lock } from 'lucide-reac
 import Link from 'next/link';
 import AppHeader from '../../../components/AppHeader';
 import TeamFooter from '../../../components/TeamFooter';
+import SecureImage from '../../../components/SecureImage';
 
 interface UserProfile {
   id: string;
   name: string;
   email: string;
   avatar?: string;
+  avatarThumbnail?: string;
   location?: string;
   memberSince?: string;
   profilePrivacy?: 'public' | 'private';
@@ -32,6 +34,7 @@ interface ConnectionUser {
   location?: string;
   bio?: string;
   memberSince: string;
+  avatarThumbnail?: string;
 }
 
 interface Connection {
@@ -234,17 +237,12 @@ export default function UserProfilePage() {
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
               {/* Avatar */}
               <div className="flex-shrink-0 mx-auto md:mx-0">
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-20 h-20 rounded-full"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                )}
+                <SecureImage
+                  fileName={user.avatarThumbnail || user.avatar}
+                  alt={`${user.name}'s profile picture`}
+                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-600"
+                  fallbackIcon={<User className="w-8 h-8 text-white" />}
+                />
               </div>
 
               {/* User Info */}
@@ -371,12 +369,17 @@ export default function UserProfilePage() {
                       className="block hover:bg-gray-800 rounded-lg p-3 transition-colors"
                     >
                       <div className="flex items-start space-x-3">
-                        {/* Profile Avatar */}
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white font-medium text-sm">
-                            {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
-                          </span>
-                        </div>
+                        {/* Profile Avatar using SecureImage */}
+                        <SecureImage
+                          fileName={connection.user.avatarThumbnail}
+                          alt={`${connection.user.name}'s profile picture`}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-600 flex-shrink-0"
+                          fallbackIcon={
+                            <span className="text-white font-medium text-sm">
+                              {connection.user.name?.charAt(0)?.toUpperCase() || '?'}
+                            </span>
+                          }
+                        />
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
