@@ -334,7 +334,7 @@ async function sendPaymentConfirmationEmail({
               </ul>
 
               <div style="text-align: center;">
-                <a href="https://seattle-anti-freeze.vercel.app/events" class="button">View All Events</a>
+                <a href="https://seattle-anti-freeze.com/events" class="button">View All Events</a>
               </div>
 
               <div class="footer">

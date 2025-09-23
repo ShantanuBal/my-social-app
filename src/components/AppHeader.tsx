@@ -180,8 +180,8 @@ export default function AppHeader() {
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Seattle Anti-Freeze",
-              "url": "https://seattle-anti-freeze.vercel.app",
-              "description": "Seattle's premier social events platform fighting social isolation through genuine connections",
+              "url": "https://seattle-anti-freeze.com",
+              "description": "Seattle's premier social events platform to bring people together IRL",
               "sameAs": ["https://www.instagram.com/seattle.anti.freeze/"],
               "address": {
                 "@type": "PostalAddress",
@@ -206,7 +206,7 @@ export default function AppHeader() {
             {/* Logo with SEO-friendly text */}
             <Link href="/" className="flex items-center" title="Seattle Anti-Freeze - Home">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Seattle Anti-Freeze
+                Seattle AF
               </h1>
             </Link>
 

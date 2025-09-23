@@ -243,14 +243,14 @@ export async function POST(
                 </ul>
 
                 <div style="text-align: center;">
-                  <a href="https://seattle-anti-freeze.vercel.app/events" class="button">View All Events</a>
+                  <a href="https://seattle-anti-freeze.com/events" class="button">View All Events</a>
                 </div>
 
                 <div class="footer">
                   <p><strong>Registered as:</strong> ${name}</p>
                   <p><strong>Email:</strong> ${email}</p>
                   <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
-                  <p>Questions? Reply to this email or visit our <a href="https://seattle-anti-freeze.vercel.app/contact">contact page</p>
+                  <p>Questions? Reply to this email or visit our <a href="https://seattle-anti-freeze.com/contact">contact page</p>
                   <p>Seattle Anti-Freeze - Fighting the Seattle Freeze, one connection at a time.</p>
                 </div>
               </div>
