@@ -257,7 +257,12 @@ export default function EventsPage() {
 
                     {/* Description */}
                     <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-                        {event.description}
+                      {event.description.split('\n').map((line, index) => (
+                        <React.Fragment key={index}>
+                          {line}
+                          {index < event.description.split('\n').length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
                     </p>
 
                     {/* Event Details */}
