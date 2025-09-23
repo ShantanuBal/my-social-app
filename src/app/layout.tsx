@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Seattle Anti-Freeze - Meet people IRL',
   description: 'Join Seattle\'s premier social events platform. Meet like-minded people, attend curated events, and build genuine friendships.',
   openGraph: {
-    title: 'Seattle Anti-Freeze - Fight Social Isolation',
+    title: 'Seattle Anti-Freeze - Meet people IRL',
     description: 'Join Seattle\'s premier social events platform. Meet like-minded people, attend curated events, and build genuine friendships.',
     url: 'https://seattle-anti-freeze.com',
     siteName: 'Seattle Anti-Freeze',
