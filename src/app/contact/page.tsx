@@ -42,7 +42,7 @@ export default function ContactPage() {
                   <p className="text-gray-300 leading-relaxed">
                     We&apos;re Shan, Jen and Greg, three kindred spirits from Seattle who believe in the power of human 
                     connection IRL. Having experienced the &quot;Seattle Freeze&quot; ourselves, we&apos;re dedicated to creating 
-                    spaces where people come together in real file and form genuine friendships and social circles.
+                    spaces where people come together in real life and form genuine friendships and social circles.
                   </p>
                 </div>
               </div>

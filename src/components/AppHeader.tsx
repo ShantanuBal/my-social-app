@@ -203,8 +203,8 @@ export default function AppHeader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
-            {/* Logo with SEO-friendly text */}
-            <Link href="/" className="flex items-center" title="Seattle Anti-Freeze - Home">
+            {/* Logo with SEO-friendly text - Hidden on mobile */}
+            <Link href="/" className="hidden md:flex items-center" title="Seattle Anti-Freeze - Home">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                 Seattle AF
               </h1>
