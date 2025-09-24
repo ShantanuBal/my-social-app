@@ -122,7 +122,9 @@ export default function EventsPage() {
   }, [session]);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Parse as local date to avoid timezone conversion
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
       month: 'long', 
