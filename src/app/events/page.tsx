@@ -122,13 +122,13 @@ export default function EventsPage() {
   }, [session]);
 
   const formatDate = (dateString: string) => {
-    // Parse as local date to avoid timezone conversion
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day); // month is 0-indexed
+    // Parse date as Pacific Time to avoid timezone conversion issues
+    const date = new Date(dateString + 'T00:00:00-07:00'); // Force Pacific Time (PDT)
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
       month: 'long', 
-      day: 'numeric' 
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles' // Ensure consistent Pacific Time display
     });
   };
 
@@ -259,12 +259,7 @@ export default function EventsPage() {
 
                     {/* Description */}
                     <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-                      {event.description.split('\n').map((line, index) => (
-                        <React.Fragment key={index}>
-                          {line}
-                          {index < event.description.split('\n').length - 1 && <br />}
-                        </React.Fragment>
-                      ))}
+                        {event.description}
                     </p>
 
                     {/* Event Details */}
