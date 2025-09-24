@@ -282,10 +282,6 @@ export default function EventsPage() {
                         <MapPin className="w-4 h-4 mr-3" />
                         <span>{event.location}</span>
                         </div>
-                        <div className="flex items-center text-sm text-gray-300">
-                        <Users className="w-4 h-4 mr-3" />
-                        <span>{event.attendees}/{event.maxAttendees} attending</span>
-                        </div>
                         <div className="flex items-center text-sm font-semibold">
                         <DollarSign className="w-4 h-4 mr-3 text-green-400" />
                         <span className={event.isPaid ? 'text-green-400' : 'text-blue-400'}>
