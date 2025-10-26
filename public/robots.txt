@@ -1,0 +1,11 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://seattle-anti-freeze.com/sitemap.xml
+
+# Optional: Disallow admin or API routes if you have them
+# User-agent: *
+# Disallow: /api/
+# Disallow: /admin/
