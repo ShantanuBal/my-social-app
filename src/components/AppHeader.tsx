@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { Search, User, LogOut, Home, Calendar, ChevronRight } from 'lucide-react';
+import { Search, User, LogOut, Home, Calendar, ChevronRight, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import Head from 'next/head';
@@ -225,11 +225,11 @@ export default function AppHeader() {
                 Home
               </Link>
               
-              <Link 
+              <Link
                 href="/events"
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActivePage('/events') 
-                    ? 'bg-gray-800 text-white' 
+                  isActivePage('/events')
+                    ? 'bg-gray-800 text-white'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`}
                 aria-current={isActivePage('/events') ? 'page' : undefined}
@@ -237,6 +237,7 @@ export default function AppHeader() {
                 <Calendar className="w-4 h-4 mr-2" />
                 Events
               </Link>
+
             </nav>
 
             {/* Mobile Navigation - Icon Only */}
@@ -254,11 +255,11 @@ export default function AppHeader() {
                 <Home className="w-5 h-5" />
               </Link>
               
-              <Link 
+              <Link
                 href="/events"
                 className={`p-2 rounded-md transition-colors ${
-                  isActivePage('/events') 
-                    ? 'bg-gray-800 text-white' 
+                  isActivePage('/events')
+                    ? 'bg-gray-800 text-white'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`}
                 title="Events"
@@ -266,6 +267,7 @@ export default function AppHeader() {
               >
                 <Calendar className="w-5 h-5" />
               </Link>
+
             </nav>
 
             {/* Search Bar */}
@@ -332,7 +334,20 @@ export default function AppHeader() {
             </div>
 
             {/* Profile Section */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
+              {session?.user?.email === 'shantanu.r.bal@gmail.com' && (
+                <Link
+                  href="/admin"
+                  className={`p-2 rounded-md transition-colors ${
+                    isActivePage('/admin')
+                      ? 'bg-gray-800 text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                  title="Admin Dashboard"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                </Link>
+              )}
               {status === 'loading' ? (
                 <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse"></div>
               ) : session ? (
