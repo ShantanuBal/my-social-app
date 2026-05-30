@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
               Guidelines for using Seattle Anti-Freeze platform
             </p>
             <p className="text-gray-500 text-sm mt-2">
-              Last updated: September 2025
+              Last updated: May 2026
             </p>
           </header>
 
@@ -180,21 +180,36 @@ export default function TermsOfServicePage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-white mb-4">Limitation of Liability</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">Assumption of Risk & Liability Waiver</h2>
               <div className="text-gray-300 space-y-4">
                 <p>
-                  While we strive to provide a safe and enjoyable platform, you understand that:
+                  By registering for or attending any Seattle Anti-Freeze event, you voluntarily assume all risks
+                  associated with participation, including but not limited to: physical injury, property damage,
+                  illness, or other harm that may result from attending or traveling to and from any event.
                 </p>
+
+                <p><strong>You agree that:</strong></p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>You attend events and interact with other users at your own risk</li>
-                  <li>We are not responsible for the actions of other users</li>
-                  <li>We cannot guarantee the accuracy of all user-provided information</li>
-                  <li>Event organizers are responsible for the safety and management of their events</li>
+                  <li>Participation in Seattle Anti-Freeze events is entirely voluntary and at your own risk</li>
+                  <li>Events take place in public spaces, outdoor environments, and third-party venues that may present inherent risks</li>
+                  <li>Seattle Anti-Freeze, its organizers, volunteers, and affiliates are not liable for any injury, illness, loss, or damage arising from your attendance at or participation in any event</li>
+                  <li>You are solely responsible for your own safety and the safety of any guests you bring</li>
+                  <li>You agree to follow all safety instructions provided by event organizers and venue staff</li>
+                  <li>You release Seattle Anti-Freeze and its organizers from any and all claims, demands, or causes of action arising out of or related to your event participation</li>
                 </ul>
-                
-                <p className="font-semibold text-orange-400">
-                  Always use common sense and trust your instincts when meeting new people or attending events.
-                </p>
+
+                <p><strong>Platform Liability:</strong></p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>We are not responsible for the actions, conduct, or behavior of other users or attendees</li>
+                  <li>We cannot guarantee the accuracy of all user-provided information</li>
+                  <li>To the maximum extent permitted by law, Seattle Anti-Freeze's total liability for any claim arising from use of this platform or attendance at events shall not exceed the amount you paid (if any) to register for the relevant event</li>
+                </ul>
+
+                <div className="bg-orange-900/20 border border-orange-600/30 rounded-lg p-4 mt-2">
+                  <p className="text-orange-300 font-semibold">
+                    Always use common sense and trust your instincts when meeting new people or attending events. If you have a medical condition or physical limitation that may be affected by event activities, please consult a healthcare professional before participating.
+                  </p>
+                </div>
               </div>
             </section>
 
