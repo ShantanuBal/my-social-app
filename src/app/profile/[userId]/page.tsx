@@ -252,7 +252,7 @@ export default function UserProfilePage() {
                 </h2>
                 
                 {/* Private Profile Notice */}
-                {user.profilePrivacy === 'private' && (
+                {user.profilePrivacy === 'private' && connectionStatus !== 'connected' && (
                   <div className="flex items-center justify-center md:justify-start mb-3">
                     <Lock className="w-4 h-4 text-orange-400 mr-2" />
                     <span className="text-sm text-orange-400 font-medium">This profile is private</span>
@@ -291,7 +291,7 @@ export default function UserProfilePage() {
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-6">Recent Events</h3>
               
-              {user.profilePrivacy === 'private' ? (
+              {user.profilePrivacy === 'private' && connectionStatus !== 'connected' ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Calendar className="w-8 h-8 text-gray-600" />
