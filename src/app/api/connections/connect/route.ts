@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     // Send email notification to the recipient
     try {
       await resend.emails.send({
-        from: 'Seattle Anti-Freeze <onboarding@resend.dev>',
+        from: 'Seattle Anti-Freeze <noreply@seattle-anti-freeze.com>',
         to: [recipient.email],
         subject: `${sender.name} wants to connect with you on Seattle Anti-Freeze`,
         html: `

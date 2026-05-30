@@ -201,7 +201,7 @@ async function sendPaymentConfirmationEmail({
     };
 
     await resend.emails.send({
-      from: 'Seattle Anti-Freeze <onboarding@resend.dev>',
+      from: 'Seattle Anti-Freeze <noreply@seattle-anti-freeze.com>',
       to: [email],
       subject: `Payment Confirmed: ${event.title}`,
       html: `

@@ -109,7 +109,7 @@ export async function POST(
           });
 
         await resend.emails.send({
-          from: 'Seattle Anti-Freeze <onboarding@resend.dev>',
+          from: 'Seattle Anti-Freeze <noreply@seattle-anti-freeze.com>',
           to: [email],
           subject: `You're on the waitlist: ${event.title}`,
           html: `
@@ -180,7 +180,7 @@ export async function POST(
       };
 
       await resend.emails.send({
-        from: 'Seattle Anti-Freeze <onboarding@resend.dev>', // Replace with your verified domain
+        from: 'Seattle Anti-Freeze <noreply@seattle-anti-freeze.com>', // Replace with your verified domain
         to: [email],
         subject: `Registration Confirmed: ${event.title}`,
         html: `
