@@ -226,6 +226,8 @@ export default function UserProfilePage() {
     );
   }
 
+  const isPrivateToViewer = user.profilePrivacy === 'private' && connectionStatus !== 'connected';
+
   return (
     <div className="min-h-screen bg-black text-white">
       <AppHeader />
@@ -252,7 +254,7 @@ export default function UserProfilePage() {
                 </h2>
                 
                 {/* Private Profile Notice */}
-                {user.profilePrivacy === 'private' && connectionStatus !== 'connected' && (
+                {isPrivateToViewer && (
                   <div className="flex items-center justify-center md:justify-start mb-3">
                     <Lock className="w-4 h-4 text-orange-400 mr-2" />
                     <span className="text-sm text-orange-400 font-medium">This profile is private</span>
@@ -260,10 +262,12 @@ export default function UserProfilePage() {
                 )}
                 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-center md:justify-start text-gray-300">
-                    <Mail className="w-4 h-4 mr-2" />
-                    <span>{user.email}</span>
-                  </div>
+                  {!isPrivateToViewer && (
+                    <div className="flex items-center justify-center md:justify-start text-gray-300">
+                      <Mail className="w-4 h-4 mr-2" />
+                      <span>{user.email}</span>
+                    </div>
+                  )}
                   
                   <div className="flex items-center justify-center md:justify-start text-gray-300">
                     <Calendar className="w-4 h-4 mr-2" />
@@ -291,7 +295,7 @@ export default function UserProfilePage() {
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-6">Recent Events</h3>
               
-              {user.profilePrivacy === 'private' && connectionStatus !== 'connected' ? (
+              {isPrivateToViewer ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Calendar className="w-8 h-8 text-gray-600" />
@@ -336,12 +340,21 @@ export default function UserProfilePage() {
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-6">
                 Connections
-                <span className="ml-2 text-sm font-normal text-gray-400">
-                  ({connections.length})
-                </span>
+                {!isPrivateToViewer && (
+                  <span className="ml-2 text-sm font-normal text-gray-400">
+                    ({connections.length})
+                  </span>
+                )}
               </h3>
 
-              {connectionsLoading ? (
+              {isPrivateToViewer ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-400">This user has a private profile.</p>
+                </div>
+              ) : connectionsLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="animate-pulse flex items-center space-x-3">
