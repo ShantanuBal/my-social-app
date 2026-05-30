@@ -37,6 +37,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -264,14 +265,26 @@ export default function EventsPage() {
                     </h3>
 
                     {/* Description */}
-                    <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-                      {event.description.split('\n').map((line, index) => (
-                        <React.Fragment key={index}>
-                          {line}
-                          {index < event.description.split('\n').length - 1 && <br />}
-                        </React.Fragment>
-                      ))}
-                    </p>
+                    <div className="mb-6">
+                      <p className={`text-gray-400 text-sm leading-relaxed ${expandedEvents.has(event.id) ? '' : 'line-clamp-4'}`}>
+                        {event.description.split('\n').map((line, index) => (
+                          <React.Fragment key={index}>
+                            {line}
+                            {index < event.description.split('\n').length - 1 && <br />}
+                          </React.Fragment>
+                        ))}
+                      </p>
+                      <button
+                        onClick={() => setExpandedEvents(prev => {
+                          const next = new Set(prev);
+                          next.has(event.id) ? next.delete(event.id) : next.add(event.id);
+                          return next;
+                        })}
+                        className="text-blue-400 hover:text-blue-300 text-xs mt-1 transition-colors"
+                      >
+                        {expandedEvents.has(event.id) ? 'See less' : 'See more'}
+                      </button>
+                    </div>
 
                     {/* Event Details */}
                     <div className="space-y-3 mb-6 flex-1">
