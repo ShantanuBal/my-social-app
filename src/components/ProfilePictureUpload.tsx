@@ -27,9 +27,8 @@ export default function ProfilePictureUpload({
     setError('');
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
-    if (!allowedTypes.includes(file.type)) {
-      setError('Please upload JPEG, PNG, WebP or HEIC images only.');
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file.');
       return;
     }
 
@@ -174,7 +173,7 @@ export default function ProfilePictureUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,.heic"
+        accept="image/*"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {
