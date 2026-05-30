@@ -202,7 +202,7 @@ export default function TermsOfServicePage() {
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>We are not responsible for the actions, conduct, or behavior of other users or attendees</li>
                   <li>We cannot guarantee the accuracy of all user-provided information</li>
-                  <li>To the maximum extent permitted by law, Seattle Anti-Freeze's total liability for any claim arising from use of this platform or attendance at events shall not exceed the amount you paid (if any) to register for the relevant event</li>
+                  <li>To the maximum extent permitted by law, Seattle Anti-Freeze&apos;s total liability for any claim arising from use of this platform or attendance at events shall not exceed the amount you paid (if any) to register for the relevant event</li>
                 </ul>
 
                 <div className="bg-orange-900/20 border border-orange-600/30 rounded-lg p-4 mt-2">

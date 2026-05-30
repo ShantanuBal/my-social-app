@@ -8,6 +8,7 @@ import RegistrationModal from '../../components/RegistrationModal';
 import PaymentCheckout from '../../components/PaymentCheckout';
 import AppHeader from '../../components/AppHeader';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Event {
   id: string;
@@ -223,8 +224,9 @@ export default function EventsPage() {
             <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {events.map((event: Event) => (
-                <div
+                <Link
                     key={event.id}
+                    href={`/events/${event.id}`}
                     className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors duration-300 border border-gray-800 hover:border-gray-600 flex flex-col h-full"
                 >
                     {/* Event Image/Icon */}
@@ -311,9 +313,11 @@ export default function EventsPage() {
                     </div>
 
                     {/* Registration Button or Status */}
-                    {renderEventButton(event)}
+                    <div onClick={e => e.preventDefault()}>
+                      {renderEventButton(event)}
                     </div>
-                </div>
+                    </div>
+                </Link>
                 ))}
             </div>
             </div>
