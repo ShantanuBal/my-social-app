@@ -100,7 +100,9 @@ export async function GET(
         eventId: registration.eventId,
         eventTitle: event?.title || 'Unknown Event',
         registeredAt: registration.createdAt || registration.registeredAt,
-        userType: registration.userType || 'registered'
+        userType: registration.userType || 'registered',
+        isWaitlisted: registration.isWaitlisted || false,
+        waitlistPosition: registration.waitlistPosition || null,
       };
     }).filter(reg => reg.eventTitle !== 'Unknown Event'); // Filter out events that couldn't be found
 

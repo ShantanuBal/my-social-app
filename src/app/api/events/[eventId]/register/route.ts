@@ -74,12 +74,71 @@ export async function POST(
       );
     }
 
-    // Check if event is at capacity
+    // Check if event is at capacity — add to waitlist instead
     if (event.attendees >= event.maxAttendees) {
+      const waitlistPosition = (event.waitlistCount || 0) + 1;
+
+      await dynamodb.send(new PutCommand({
+        TableName: config.aws.registrationsTable,
+        Item: {
+          eventId,
+          userId: finalUserId,
+          userType,
+          name,
+          age: parseInt(age) || 0,
+          gender,
+          phoneNumber,
+          email,
+          registeredAt: new Date().toISOString(),
+          isWaitlisted: true,
+          waitlistPosition,
+        },
+      }));
+
+      await dynamodb.send(new UpdateCommand({
+        TableName: config.aws.eventsTable,
+        Key: { id: eventId },
+        UpdateExpression: 'ADD waitlistCount :inc',
+        ExpressionAttributeValues: { ':inc': 1 },
+      }));
+
+      try {
+        const formatDate = (dateString: string) =>
+          new Date(dateString).toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+          });
+
+        await resend.emails.send({
+          from: 'Seattle Anti-Freeze <onboarding@resend.dev>',
+          to: [email],
+          subject: `You're on the waitlist: ${event.title}`,
+          html: `
+            <!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f9f9f9;">
+              <div style="background:white;padding:40px;border-radius:8px;">
+                <h1 style="color:#333;">You're on the waitlist!</h1>
+                <p>Hi ${name}, you're <strong>#${waitlistPosition}</strong> on the waitlist for:</p>
+                <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px;border-radius:8px;margin:20px 0;">
+                  <strong style="font-size:18px;">${event.title}</strong><br/><br/>
+                  📅 ${formatDate(event.date)}<br/>
+                  🕐 ${event.time}<br/>
+                  📍 ${event.location}
+                </div>
+                <p>We'll email you immediately if a spot opens up. Fingers crossed!</p>
+                <p style="color:#666;font-size:14px;">Seattle Anti-Freeze — Fighting the Seattle Freeze, one connection at a time.</p>
+              </div>
+            </body></html>
+          `,
+          text: `Hi ${name}, you're #${waitlistPosition} on the waitlist for ${event.title} on ${formatDate(event.date)} at ${event.time}, ${event.location}. We'll email you if a spot opens up!`,
+        });
+      } catch (emailError) {
+        console.error('Failed to send waitlist email:', emailError);
+      }
+
       return NextResponse.json({
-        error: 'This event is at capacity. Registration is no longer available.',
-        atCapacity: true
-      }, { status: 409 });
+        waitlisted: true,
+        position: waitlistPosition,
+        message: `You've been added to the waitlist at position #${waitlistPosition}.`,
+      });
     }
 
     // 1. Save registration
@@ -95,6 +154,7 @@ export async function POST(
         phoneNumber,
         email,
         registeredAt: new Date().toISOString(),
+        isWaitlisted: false,
       },
     }));
 

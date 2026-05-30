@@ -11,15 +11,17 @@ interface RegistrationModalProps {
   onClose: () => void;
   eventId: string;
   eventTitle: string;
+  isWaitlist?: boolean;
   onSuccess: () => void;
 }
 
-export default function RegistrationModal({ 
-  isOpen, 
-  onClose, 
-  eventId, 
+export default function RegistrationModal({
+  isOpen,
+  onClose,
+  eventId,
   eventTitle,
-  onSuccess 
+  isWaitlist = false,
+  onSuccess
 }: RegistrationModalProps) {
   const { data: session, status } = useSession();
   const [showGuestForm, setShowGuestForm] = useState(false);
@@ -34,6 +36,7 @@ export default function RegistrationModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
 
   // Auto-fill email from session when component loads
   useEffect(() => {
@@ -72,7 +75,6 @@ export default function RegistrationModal({
       const responseData = await response.json();
 
       if (!response.ok) {
-        // Handle specific error cases
         if (responseData.alreadyRegistered) {
           setError(responseData.error || 'You are already registered for this event.');
         } else if (responseData.atCapacity) {
@@ -83,6 +85,9 @@ export default function RegistrationModal({
         return;
       }
 
+      if (responseData.waitlisted) {
+        setWaitlistPosition(responseData.position);
+      }
       setIsSuccess(true);
       onSuccess();
     } catch (err) {
@@ -109,7 +114,6 @@ export default function RegistrationModal({
       const responseData = await response.json();
 
       if (!response.ok) {
-        // Handle specific error cases
         if (responseData.alreadyRegistered) {
           setError(responseData.error || 'This email is already registered for this event.');
         } else if (responseData.atCapacity) {
@@ -120,6 +124,9 @@ export default function RegistrationModal({
         return;
       }
 
+      if (responseData.waitlisted) {
+        setWaitlistPosition(responseData.position);
+      }
       setIsSuccess(true);
       onSuccess();
     } catch (err) {
@@ -148,29 +155,48 @@ export default function RegistrationModal({
 
   // Success view
   if (isSuccess) {
+    const isWaitlistSuccess = waitlistPosition !== null;
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-700 text-center">
           <div className="mb-6">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-white" />
+            <div className={`w-16 h-16 ${isWaitlistSuccess ? 'bg-yellow-500' : 'bg-green-500'} rounded-full flex items-center justify-center mx-auto mb-4`}>
+              {isWaitlistSuccess ? (
+                <span className="text-2xl">⏳</span>
+              ) : (
+                <CheckCircle className="w-8 h-8 text-white" />
+              )}
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Registration Confirmed!</h2>
-            <p className="text-gray-300 mb-2">You have successfully registered for</p>
-            <p className="text-blue-400 font-semibold text-lg">{eventTitle}</p>
-            <div className="bg-gray-800 rounded-lg p-4 mt-4">
-              <div className="flex items-center justify-center mb-2">
-                <Mail className="w-5 h-5 text-blue-400 mr-2" />
-                <span className="text-green-400 font-medium">Confirmation email sent!</span>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Check your inbox for event details and next steps.
-              </p>
-            </div>
+            <h2 className="text-xl font-bold text-white mb-2">
+              {isWaitlistSuccess ? "You're on the Waitlist!" : 'Registration Confirmed!'}
+            </h2>
+            {isWaitlistSuccess ? (
+              <>
+                <p className="text-gray-300 mb-2">You&apos;re <span className="text-yellow-400 font-bold">#{waitlistPosition}</span> on the waitlist for</p>
+                <p className="text-blue-400 font-semibold text-lg">{eventTitle}</p>
+                <div className="bg-gray-800 rounded-lg p-4 mt-4">
+                  <p className="text-gray-300 text-sm">We&apos;ll email you immediately if a spot opens up. Fingers crossed! 🤞</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-300 mb-2">You have successfully registered for</p>
+                <p className="text-blue-400 font-semibold text-lg">{eventTitle}</p>
+                <div className="bg-gray-800 rounded-lg p-4 mt-4">
+                  <div className="flex items-center justify-center mb-2">
+                    <Mail className="w-5 h-5 text-blue-400 mr-2" />
+                    <span className="text-green-400 font-medium">Confirmation email sent!</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Check your inbox for event details and next steps.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
           <button
             onClick={handleClose}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300"
+            className={`bg-gradient-to-r ${isWaitlistSuccess ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'} text-white py-3 px-6 rounded-lg font-semibold transition-all duration-300`}
           >
             Close
           </button>
@@ -412,9 +438,9 @@ export default function RegistrationModal({
           <button
             onClick={handleQuickRegister}
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 mb-4"
+            className={`w-full bg-gradient-to-r ${isWaitlist ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' : 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'} disabled:opacity-50 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 mb-4`}
           >
-            {isSubmitting ? 'Registering...' : 'Register Now'}
+            {isSubmitting ? 'Submitting...' : isWaitlist ? 'Join Waitlist' : 'Register Now'}
           </button>
         </div>
 

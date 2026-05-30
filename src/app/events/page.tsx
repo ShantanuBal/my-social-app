@@ -18,17 +18,16 @@ interface Event {
   location: string;
   attendees: number;
   maxAttendees: number;
+  waitlistCount?: number;
   category: string;
   image: string;
-  
-  // pricing fields
-  price: number; // in cents (e.g., 2500 = $25.00, 0 = free)
-  currency: string; // "usd"
-  isPaid: boolean; // true if price > 0, false for free events
+  price: number;
+  currency: string;
+  isPaid: boolean;
 }
 
 interface RegistrationStatus {
-  [eventId: string]: boolean;
+  [eventId: string]: 'registered' | 'waitlisted';
 }
 
 export default function EventsPage() {
@@ -67,9 +66,9 @@ export default function EventsPage() {
       if (response.ok) {
         const registrations = await response.json();
         const statusMap: RegistrationStatus = {};
-        
-        registrations.forEach((registration: { eventId: string }) => {
-          statusMap[registration.eventId] = true;
+
+        registrations.forEach((registration: { eventId: string; isWaitlisted?: boolean }) => {
+          statusMap[registration.eventId] = registration.isWaitlisted ? 'waitlisted' : 'registered';
         });
         
         setRegistrationStatus(statusMap);
@@ -97,10 +96,9 @@ export default function EventsPage() {
   };
 
   const handleOptimisticRegistration = (eventId: string) => {
-    // Immediately update registration status for optimistic UI
     setRegistrationStatus(prev => ({
       ...prev,
-      [eventId]: true
+      [eventId]: 'registered' as const
     }));
     // Also refresh events to show updated attendee count
     fetchEvents();
@@ -145,15 +143,11 @@ export default function EventsPage() {
     return colors[category] || 'bg-gray-500';
   };
 
-  const isRegisteredForEvent = (eventId: string) => {
-    return registrationStatus[eventId] || false;
-  };
-
   const renderEventButton = (event: Event) => {
-    const isRegistered = isRegisteredForEvent(event.id);
+    const status = registrationStatus[event.id];
     const isAtCapacity = event.attendees >= event.maxAttendees;
 
-    if (isRegistered) {
+    if (status === 'registered') {
       return (
         <div className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
           <CheckCircle className="w-5 h-5 mr-2" />
@@ -162,17 +156,28 @@ export default function EventsPage() {
       );
     }
 
-    if (isAtCapacity) {
+    if (status === 'waitlisted') {
       return (
-        <div className="w-full bg-gray-600 text-gray-300 py-3 px-4 rounded-lg font-semibold text-center cursor-not-allowed">
-          Event at Capacity
+        <div className="w-full bg-yellow-600/80 text-white py-3 px-4 rounded-lg font-semibold text-center">
+          ⏳ You&apos;re on the waitlist
         </div>
       );
     }
 
+    if (isAtCapacity) {
+      return (
+        <button
+          onClick={() => handleJoinEvent(event)}
+          className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto"
+        >
+          Join Waitlist
+        </button>
+      );
+    }
+
     return (
-      <button 
-        onClick={() => handleJoinEvent(event)} 
+      <button
+        onClick={() => handleJoinEvent(event)}
         className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 mt-auto"
       >
         {event.isPaid ? `Register - ${formatPrice(event.price)}` : 'Join Event - Free'}
@@ -306,6 +311,7 @@ export default function EventsPage() {
                 onClose={() => setIsModalOpen(false)}
                 eventId={selectedEvent.id}
                 eventTitle={selectedEvent.title}
+                isWaitlist={selectedEvent.attendees >= selectedEvent.maxAttendees}
                 onSuccess={handleRegistrationSuccess}
             />
         )}
